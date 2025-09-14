@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passcode Test</title>
+    <link rel="stylesheet" href="assets/css/passcode.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="passcode-body">
+    <div class="passcode-container">
+        <div class="passcode-content">
+            <h1>Passcode Test</h1>
+            <p>Test the keypad functionality</p>
+            
+            <!-- Passcode Entry -->
+            <div class="passcode-section">
+                <div class="passcode-display">
+                    <div class="passcode-dots">
+                        <div class="dot" id="dot-1"></div>
+                        <div class="dot" id="dot-2"></div>
+                        <div class="dot" id="dot-3"></div>
+                        <div class="dot" id="dot-4"></div>
+                        <div class="dot" id="dot-5"></div>
+                        <div class="dot" id="dot-6"></div>
+                    </div>
+                </div>
+                
+                <div id="debug-info" style="color: #fff; margin: 1rem 0; font-size: 0.9rem;">
+                    Current passcode: <span id="current-passcode">(empty)</span><br>
+                    Length: <span id="passcode-length">0</span>
+                </div>
+            </div>
+            
+            <!-- Keypad -->
+            <div class="keypad" id="keypad">
+                <div class="keypad-row">
+                    <button class="key" data-number="1">
+                        <span class="number">1</span>
+                    </button>
+                    <button class="key" data-number="2">
+                        <span class="number">2</span>
+                        <span class="letters">ABC</span>
+                    </button>
+                    <button class="key" data-number="3">
+                        <span class="number">3</span>
+                        <span class="letters">DEF</span>
+                    </button>
+                </div>
+                <div class="keypad-row">
+                    <button class="key" data-number="4">
+                        <span class="number">4</span>
+                        <span class="letters">GHI</span>
+                    </button>
+                    <button class="key" data-number="5">
+                        <span class="number">5</span>
+                        <span class="letters">JKL</span>
+                    </button>
+                    <button class="key" data-number="6">
+                        <span class="number">6</span>
+                        <span class="letters">MNO</span>
+                    </button>
+                </div>
+                <div class="keypad-row">
+                    <button class="key" data-number="7">
+                        <span class="number">7</span>
+                        <span class="letters">PQRS</span>
+                    </button>
+                    <button class="key" data-number="8">
+                        <span class="number">8</span>
+                        <span class="letters">TUV</span>
+                    </button>
+                    <button class="key" data-number="9">
+                        <span class="number">9</span>
+                        <span class="letters">WXYZ</span>
+                    </button>
+                </div>
+                <div class="keypad-row">
+                    <button class="key key-empty"></button>
+                    <button class="key" data-number="0">
+                        <span class="number">0</span>
+                    </button>
+                    <button class="key key-delete" id="delete-key">
+                        <i class="fas fa-delete-left"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentPasscode = '';
+        
+        // Initialize keypad
+        function initializeKeypad() {
+            console.log('Initializing keypad...');
+            const keys = document.querySelectorAll('.key[data-number]');
+            const deleteKey = document.getElementById('delete-key');
+            
+            console.log('Found keys:', keys.length);
+            console.log('Delete key:', deleteKey);
+            
+            keys.forEach((key, index) => {
+                key.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('Key clicked:', this.getAttribute('data-number'));
+                    const number = this.getAttribute('data-number');
+                    addToPasscode(number);
+                });
+            });
+            
+            if (deleteKey) {
+                deleteKey.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('Delete key clicked');
+                    removeFromPasscode();
+                });
+            } else {
+                console.error('Delete key not found!');
+            }
+        }
+        
+        // Add number to passcode
+        function addToPasscode(number) {
+            console.log('Adding to passcode:', number, 'Current length:', currentPasscode.length);
+            if (currentPasscode.length < 6) {
+                currentPasscode += number;
+                updatePasscodeDisplay();
+                updateDebugInfo();
+            } else {
+                console.log('Passcode already at max length');
+            }
+        }
+        
+        // Remove number from passcode
+        function removeFromPasscode() {
+            console.log('Removing from passcode. Current length:', currentPasscode.length);
+            if (currentPasscode.length > 0) {
+                currentPasscode = currentPasscode.slice(0, -1);
+                updatePasscodeDisplay();
+                updateDebugInfo();
+                console.log('New passcode:', currentPasscode);
+            } else {
+                console.log('Passcode already empty');
+            }
+        }
+        
+        // Update passcode display
+        function updatePasscodeDisplay() {
+            const dots = document.querySelectorAll('.dot');
+            
+            dots.forEach((dot, index) => {
+                if (index < currentPasscode.length) {
+                    dot.classList.add('filled');
+                } else {
+                    dot.classList.remove('filled');
+                }
+            });
+        }
+        
+        // Update debug info
+        function updateDebugInfo() {
+            document.getElementById('current-passcode').textContent = currentPasscode || '(empty)';
+            document.getElementById('passcode-length').textContent = currentPasscode.length;
+        }
+        
+        // Handle keyboard input
+        document.addEventListener('keydown', function(e) {
+            console.log('Key pressed:', e.key);
+            if (e.key >= '0' && e.key <= '9') {
+                e.preventDefault();
+                addToPasscode(e.key);
+            } else if (e.key === 'Backspace') {
+                e.preventDefault();
+                removeFromPasscode();
+            }
+        });
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeKeypad();
+            updateDebugInfo();
+        });
+    </script>
+</body>
+</html>
