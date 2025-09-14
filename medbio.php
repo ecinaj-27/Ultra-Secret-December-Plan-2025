@@ -8,6 +8,9 @@ require_login();
 $database = new Database();
 $db = $database->getConnection();
 
+// Check if user is admin
+$is_admin = is_admin();
+
 // Get study entries
 $query = "SELECT * FROM study_entries WHERE user_id = :user_id ORDER BY entry_date DESC LIMIT 10";
 $stmt = $db->prepare($query);
@@ -80,6 +83,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt->execute();
             break;
             
+        case 'edit_flashcard':
+            $id = $_POST['id'];
+            $front_text = sanitize_input($_POST['front_text']);
+            $back_text = sanitize_input($_POST['back_text']);
+            $category = sanitize_input($_POST['category']);
+            $difficulty = sanitize_input($_POST['difficulty']);
+            
+            $query = "UPDATE flashcards SET front_text = :front_text, back_text = :back_text, category = :category, difficulty = :difficulty WHERE id = :id AND user_id = :user_id";
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':id', $id);
+            $stmt->bindParam(':user_id', $_SESSION['user_id']);
+            $stmt->bindParam(':front_text', $front_text);
+            $stmt->bindParam(':back_text', $back_text);
+            $stmt->bindParam(':category', $category);
+            $stmt->bindParam(':difficulty', $difficulty);
+            $stmt->execute();
+            break;
+            
+        case 'delete_flashcard':
+            $id = $_POST['id'];
+            $query = "DELETE FROM flashcards WHERE id = :id AND user_id = :user_id";
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':id', $id);
+            $stmt->bindParam(':user_id', $_SESSION['user_id']);
+            $stmt->execute();
+            break;
+            
         case 'add_lab_entry':
             $title = sanitize_input($_POST['title']);
             $content = sanitize_input($_POST['content']);
@@ -129,6 +159,67 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt->bindParam(':user_id', $_SESSION['user_id']);
             $stmt->execute();
             break;
+            
+        case 'upload_resource':
+            if (isset($_FILES['resource_file']) && $_FILES['resource_file']['error'] == 0) {
+                $file = $_FILES['resource_file'];
+                $tags = sanitize_input($_POST['tags']);
+                
+                // Create uploads/resources directory if it doesn't exist
+                $upload_dir = 'uploads/resources/';
+                if (!file_exists($upload_dir)) {
+                    mkdir($upload_dir, 0777, true);
+                }
+                
+                // Generate unique filename
+                $file_extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+                $new_filename = uniqid() . '.' . $file_extension;
+                $upload_path = $upload_dir . $new_filename;
+                
+                // Move uploaded file
+                if (move_uploaded_file($file['tmp_name'], $upload_path)) {
+                    // Get file info
+                    $original_name = $file['name'];
+                    $file_size = $file['size'];
+                    $file_type = $file['type'];
+                    
+                    // Insert into database
+                    $query = "INSERT INTO resources (user_id, filename, original_name, file_path, file_type, file_size, tags) VALUES (:user_id, :filename, :original_name, :file_path, :file_type, :file_size, :tags)";
+                    $stmt = $db->prepare($query);
+                    $stmt->bindParam(':user_id', $_SESSION['user_id']);
+                    $stmt->bindParam(':filename', $new_filename);
+                    $stmt->bindParam(':original_name', $original_name);
+                    $stmt->bindParam(':file_path', $upload_path);
+                    $stmt->bindParam(':file_type', $file_type);
+                    $stmt->bindParam(':file_size', $file_size);
+                    $stmt->bindParam(':tags', $tags);
+                    $stmt->execute();
+                }
+            }
+            break;
+            
+        case 'delete_resource':
+            $resource_id = $_POST['resource_id'];
+            
+            // First get the file path to delete the physical file
+            $query = "SELECT file_path FROM resources WHERE id = :id AND user_id = :user_id";
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':id', $resource_id);
+            $stmt->bindParam(':user_id', $_SESSION['user_id']);
+            $stmt->execute();
+            $resource = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($resource && file_exists($resource['file_path'])) {
+                unlink($resource['file_path']);
+            }
+            
+            // Delete from database
+            $query = "DELETE FROM resources WHERE id = :id AND user_id = :user_id";
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':id', $resource_id);
+            $stmt->bindParam(':user_id', $_SESSION['user_id']);
+            $stmt->execute();
+            break;
     }
     
     header('Location: medbio.php');
@@ -140,7 +231,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MedBio Study Hub - Our Secret Place</title>
+    <title>For My MedBio Bebe - Our Secret Place</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -151,7 +242,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <main class="main-content">
         <div class="medbio-container">
             <div class="page-header">
-                <h1><i class="fas fa-graduation-cap"></i> MedBio Study Hub</h1>
+                <h1><i class="fas fa-graduation-cap"></i> For My MedBio Bebe</h1>
                 <p>Your comprehensive medical study companion</p>
             </div>
             
@@ -325,12 +416,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <?php else: ?>
                             <div class="flashcard-grid">
                                 <?php foreach ($flashcards as $card): ?>
-                                    <div class="flashcard" onclick="flipCard(this)">
-                                        <div class="card-front">
-                                            <h4><?php echo htmlspecialchars($card['front_text']); ?></h4>
+                                    <div class="flashcard-container">
+                                        <div class="flashcard" onclick="flipCard(this)">
+                                            <div class="card-front">
+                                                <h4><?php echo htmlspecialchars($card['front_text']); ?></h4>
+                                                <div class="card-category"><?php echo htmlspecialchars($card['category']); ?></div>
+                                            </div>
+                                            <div class="card-back">
+                                                <h4><?php echo htmlspecialchars($card['back_text']); ?></h4>
+                                                <div class="card-difficulty"><?php echo htmlspecialchars($card['difficulty']); ?></div>
+                                            </div>
                                         </div>
-                                        <div class="card-back">
-                                            <h4><?php echo htmlspecialchars($card['back_text']); ?></h4>
+                                        <div class="flashcard-actions">
+                                            <button class="btn-icon" onclick="editFlashcard(<?php echo $card['id']; ?>, '<?php echo htmlspecialchars($card['front_text'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($card['back_text'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($card['category'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($card['difficulty'], ENT_QUOTES); ?>')" title="Edit Card">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-icon" onclick="deleteFlashcard(<?php echo $card['id']; ?>)" title="Delete Card">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
@@ -429,7 +532,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <?php foreach ($resources as $resource): ?>
                                     <div class="resource-item" data-tags="<?php echo strtolower($resource['tags']); ?>">
                                         <div class="resource-icon">
-                                            <i class="fas fa-file-pdf"></i>
+                                            <?php
+                                            $file_extension = strtolower(pathinfo($resource['original_name'], PATHINFO_EXTENSION));
+                                            $icon_class = 'fas fa-file';
+                                            
+                                            switch ($file_extension) {
+                                                case 'pdf':
+                                                    $icon_class = 'fas fa-file-pdf';
+                                                    break;
+                                                case 'doc':
+                                                case 'docx':
+                                                    $icon_class = 'fas fa-file-word';
+                                                    break;
+                                                case 'ppt':
+                                                case 'pptx':
+                                                    $icon_class = 'fas fa-file-powerpoint';
+                                                    break;
+                                                case 'txt':
+                                                    $icon_class = 'fas fa-file-alt';
+                                                    break;
+                                                case 'jpg':
+                                                case 'jpeg':
+                                                case 'png':
+                                                case 'gif':
+                                                    $icon_class = 'fas fa-file-image';
+                                                    break;
+                                                default:
+                                                    $icon_class = 'fas fa-file';
+                                            }
+                                            ?>
+                                            <i class="<?php echo $icon_class; ?>"></i>
                                         </div>
                                         <div class="resource-info">
                                             <h5><?php echo htmlspecialchars($resource['original_name']); ?></h5>
@@ -441,9 +573,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                             </div>
                                         </div>
                                         <div class="resource-actions">
-                                            <a href="<?php echo $resource['file_path']; ?>" target="_blank" class="btn-icon">
+                                            <a href="<?php echo $resource['file_path']; ?>" target="_blank" class="btn-icon" title="Download">
                                                 <i class="fas fa-download"></i>
                                             </a>
+                                            <button class="btn-icon" onclick="deleteResource(<?php echo $resource['id']; ?>)" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
@@ -460,6 +595,104 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Flashcard flip functionality
         function flipCard(card) {
             card.classList.toggle('flipped');
+        }
+        
+        // Flashcard management functions
+        function editFlashcard(id, frontText, backText, category, difficulty) {
+            const modal = document.getElementById('editFlashcardModal');
+            if (!modal) {
+                createEditModal();
+            }
+            
+            document.getElementById('edit_card_id').value = id;
+            document.getElementById('edit_front_text').value = frontText;
+            document.getElementById('edit_back_text').value = backText;
+            document.getElementById('edit_category').value = category;
+            document.getElementById('edit_difficulty').value = difficulty;
+            
+            document.getElementById('editFlashcardModal').style.display = 'block';
+        }
+        
+        function deleteFlashcard(id) {
+            if (confirm('Are you sure you want to delete this flashcard?')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.innerHTML = `
+                    <input type="hidden" name="action" value="delete_flashcard">
+                    <input type="hidden" name="id" value="${id}">
+                `;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+        
+        function createEditModal() {
+            const modal = document.createElement('div');
+            modal.id = 'editFlashcardModal';
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Edit Flashcard</h3>
+                        <span class="close" onclick="closeEditModal()">&times;</span>
+                    </div>
+                    <form method="POST" class="modal-form">
+                        <input type="hidden" name="action" value="edit_flashcard">
+                        <input type="hidden" name="id" id="edit_card_id">
+                        <div class="form-group">
+                            <label>Front Text:</label>
+                            <input type="text" name="front_text" id="edit_front_text" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Back Text:</label>
+                            <input type="text" name="back_text" id="edit_back_text" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Category:</label>
+                            <input type="text" name="category" id="edit_category" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Difficulty:</label>
+                            <select name="difficulty" id="edit_difficulty" required>
+                                <option value="Easy">Easy</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Hard">Hard</option>
+                            </select>
+                        </div>
+                        <div class="modal-actions">
+                            <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        function closeEditModal() {
+            document.getElementById('editFlashcardModal').style.display = 'none';
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('editFlashcardModal');
+            if (event.target === modal) {
+                closeEditModal();
+            }
+        }
+        
+        // Resource management functions
+        function deleteResource(resourceId) {
+            if (confirm('Are you sure you want to delete this resource?')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.innerHTML = `
+                    <input type="hidden" name="action" value="delete_resource">
+                    <input type="hidden" name="resource_id" value="${resourceId}">
+                `;
+                document.body.appendChild(form);
+                form.submit();
+            }
         }
         
         // Resource search functionality

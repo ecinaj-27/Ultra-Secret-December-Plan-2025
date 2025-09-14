@@ -41,6 +41,24 @@ function get_anniversary_countdown() {
 }
 
 function get_random_quote() {
+    // Try to get from database first
+    try {
+        $database = new Database();
+        $db = $database->getConnection();
+        
+        $query = "SELECT content FROM custom_inspirations WHERE is_active = 1 ORDER BY RAND() LIMIT 1";
+        $stmt = $db->prepare($query);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($result && !empty($result['content'])) {
+            return $result['content'];
+        }
+    } catch (Exception $e) {
+        // Fall back to hardcoded if database fails
+    }
+    
+    // Fallback to hardcoded quotes
     $quotes = [
         "You are my today and all of my tomorrows.",
         "In all the world, there is no heart for me like yours.",
@@ -58,6 +76,24 @@ function get_random_quote() {
 }
 
 function get_random_compliment() {
+    // Try to get from database first
+    try {
+        $database = new Database();
+        $db = $database->getConnection();
+        
+        $query = "SELECT content FROM custom_compliments WHERE is_active = 1 ORDER BY RAND() LIMIT 1";
+        $stmt = $db->prepare($query);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($result && !empty($result['content'])) {
+            return $result['content'];
+        }
+    } catch (Exception $e) {
+        // Fall back to hardcoded if database fails
+    }
+    
+    // Fallback to hardcoded compliments
     $compliments = [
         "Your smile could light up the darkest room.",
         "You have the most beautiful eyes I've ever seen.",
@@ -190,5 +226,130 @@ function has_specific_permission($permission) {
     
     $permissions = json_decode($role_data['permissions'], true);
     return isset($permissions[$permission]) && $permissions[$permission] === true;
+}
+
+// New functions for managing custom content
+function get_all_compliments() {
+    try {
+        $database = new Database();
+        $db = $database->getConnection();
+        
+        $query = "SELECT * FROM custom_compliments ORDER BY created_at DESC";
+        $stmt = $db->prepare($query);
+        $stmt->execute();
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+function get_all_inspirations() {
+    try {
+        $database = new Database();
+        $db = $database->getConnection();
+        
+        $query = "SELECT * FROM custom_inspirations ORDER BY created_at DESC";
+        $stmt = $db->prepare($query);
+        $stmt->execute();
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+function add_custom_compliment($content, $user_id) {
+    try {
+        $database = new Database();
+        $db = $database->getConnection();
+        
+        $query = "INSERT INTO custom_compliments (content, created_by) VALUES (:content, :user_id)";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':content', $content);
+        $stmt->bindParam(':user_id', $user_id);
+        
+        return $stmt->execute();
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+function add_custom_inspiration($content, $user_id) {
+    try {
+        $database = new Database();
+        $db = $database->getConnection();
+        
+        $query = "INSERT INTO custom_inspirations (content, created_by) VALUES (:content, :user_id)";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':content', $content);
+        $stmt->bindParam(':user_id', $user_id);
+        
+        return $stmt->execute();
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+function toggle_compliment_status($id, $is_active) {
+    try {
+        $database = new Database();
+        $db = $database->getConnection();
+        
+        $query = "UPDATE custom_compliments SET is_active = :is_active WHERE id = :id";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':is_active', $is_active, PDO::PARAM_BOOL);
+        $stmt->bindParam(':id', $id);
+        
+        return $stmt->execute();
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+function toggle_inspiration_status($id, $is_active) {
+    try {
+        $database = new Database();
+        $db = $database->getConnection();
+        
+        $query = "UPDATE custom_inspirations SET is_active = :is_active WHERE id = :id";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':is_active', $is_active, PDO::PARAM_BOOL);
+        $stmt->bindParam(':id', $id);
+        
+        return $stmt->execute();
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+function delete_custom_compliment($id) {
+    try {
+        $database = new Database();
+        $db = $database->getConnection();
+        
+        $query = "DELETE FROM custom_compliments WHERE id = :id";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':id', $id);
+        
+        return $stmt->execute();
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+function delete_custom_inspiration($id) {
+    try {
+        $database = new Database();
+        $db = $database->getConnection();
+        
+        $query = "DELETE FROM custom_inspirations WHERE id = :id";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':id', $id);
+        
+        return $stmt->execute();
+    } catch (Exception $e) {
+        return false;
+    }
 }
 ?>

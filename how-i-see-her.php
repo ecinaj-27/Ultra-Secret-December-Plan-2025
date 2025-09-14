@@ -235,25 +235,51 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         });
         
         // Compliment generator
-        const compliments = [
-            "Your smile could light up the darkest room.",
-            "You have the most beautiful eyes I've ever seen.",
-            "Your laugh is my favorite sound in the world.",
-            "You make everything better just by being you.",
-            "Your kindness touches everyone around you.",
-            "You are incredibly intelligent and wise.",
-            "Your creativity never ceases to amaze me.",
-            "You have the most caring heart.",
-            "Your strength inspires me every day.",
-            "You are absolutely perfect just as you are.",
-            "Your presence makes any place feel like home.",
-            "You have the most beautiful soul I've ever encountered.",
-            "Your love has changed my life in the best way possible.",
-            "You are my greatest adventure and my safest place.",
-            "Your beauty radiates from within and illuminates everything around you."
-        ];
+        let compliments = [];
+        
+        // Load compliments from API
+        async function loadCompliments() {
+            try {
+                const response = await fetch('api/get-compliments.php');
+                const data = await response.json();
+                compliments = data.compliments || [];
+            } catch (error) {
+                console.error('Error loading compliments:', error);
+                // Fallback to hardcoded compliments
+                compliments = [
+                    "Your smile could light up the darkest room.",
+                    "You have the most beautiful eyes I've ever seen.",
+                    "Your laugh is my favorite sound in the world.",
+                    "You make everything better just by being you.",
+                    "Your kindness touches everyone around you.",
+                    "You are incredibly intelligent and wise.",
+                    "Your creativity never ceases to amaze me.",
+                    "You have the most caring heart.",
+                    "Your strength inspires me every day.",
+                    "You are absolutely perfect just as you are.",
+                    "Your presence makes any place feel like home.",
+                    "You have the most beautiful soul I've ever encountered.",
+                    "Your love has changed my life in the best way possible.",
+                    "You are my greatest adventure and my safest place.",
+                    "Your beauty radiates from within and illuminates everything around you."
+                ];
+            }
+        }
         
         function generateNewCompliment() {
+            if (compliments.length === 0) {
+                // If compliments haven't loaded yet, try to load them
+                loadCompliments().then(() => {
+                    if (compliments.length > 0) {
+                        showRandomCompliment();
+                    }
+                });
+                return;
+            }
+            showRandomCompliment();
+        }
+        
+        function showRandomCompliment() {
             const complimentText = document.getElementById('compliment-text');
             const randomCompliment = compliments[Math.floor(Math.random() * compliments.length)];
             complimentText.textContent = `"${randomCompliment}"`;
@@ -264,6 +290,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
                 complimentText.style.transform = 'scale(1)';
             }, 100);
         }
+        
+        // Load compliments when page loads
+        loadCompliments();
         
         // Toggle add post form (admin only)
         function toggleAddPostForm() {

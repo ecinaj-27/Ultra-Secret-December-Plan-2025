@@ -57,6 +57,8 @@ $flashcards = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Get timeline events and locations for admin
 $timeline_events = [];
 $locations = [];
+$custom_compliments = [];
+$custom_inspirations = [];
 if ($is_admin) {
     $query = "SELECT * FROM timeline_events ORDER BY event_date ASC";
     $stmt = $db->prepare($query);
@@ -67,6 +69,10 @@ if ($is_admin) {
     $stmt = $db->prepare($query);
     $stmt->execute();
     $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Get custom content
+    $custom_compliments = get_all_compliments();
+    $custom_inspirations = get_all_inspirations();
 }
 
 // Handle form submissions
@@ -226,6 +232,95 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $query = "DELETE FROM todo_items WHERE id = :todo_id AND user_id = :user_id";
             $stmt = $db->prepare($query);
             $stmt->bindParam(':todo_id', $todo_id);
+            $stmt->bindParam(':user_id', $_SESSION['user_id']);
+            $stmt->execute();
+            break;
+            
+        // Custom content management (admin only)
+        case 'add_custom_compliment':
+            if ($is_admin) {
+                $content = sanitize_input($_POST['content']);
+                add_custom_compliment($content, $_SESSION['user_id']);
+            }
+            break;
+            
+        case 'add_custom_inspiration':
+            if ($is_admin) {
+                $content = sanitize_input($_POST['content']);
+                add_custom_inspiration($content, $_SESSION['user_id']);
+            }
+            break;
+            
+        case 'toggle_compliment':
+            if ($is_admin) {
+                $id = $_POST['id'];
+                $is_active = $_POST['is_active'] === '1';
+                toggle_compliment_status($id, $is_active);
+            }
+            break;
+            
+        case 'toggle_inspiration':
+            if ($is_admin) {
+                $id = $_POST['id'];
+                $is_active = $_POST['is_active'] === '1';
+                toggle_inspiration_status($id, $is_active);
+            }
+            break;
+            
+        case 'delete_compliment':
+            if ($is_admin) {
+                $id = $_POST['id'];
+                delete_custom_compliment($id);
+            }
+            break;
+            
+        case 'delete_inspiration':
+            if ($is_admin) {
+                $id = $_POST['id'];
+                delete_custom_inspiration($id);
+            }
+            break;
+            
+        // Flashcard management
+        case 'add_flashcard':
+            $front_text = sanitize_input($_POST['front_text']);
+            $back_text = sanitize_input($_POST['back_text']);
+            $category = sanitize_input($_POST['category']);
+            $difficulty = sanitize_input($_POST['difficulty']);
+            
+            $query = "INSERT INTO flashcards (user_id, front_text, back_text, category, difficulty) VALUES (:user_id, :front_text, :back_text, :category, :difficulty)";
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':user_id', $_SESSION['user_id']);
+            $stmt->bindParam(':front_text', $front_text);
+            $stmt->bindParam(':back_text', $back_text);
+            $stmt->bindParam(':category', $category);
+            $stmt->bindParam(':difficulty', $difficulty);
+            $stmt->execute();
+            break;
+            
+        case 'edit_flashcard':
+            $id = $_POST['id'];
+            $front_text = sanitize_input($_POST['front_text']);
+            $back_text = sanitize_input($_POST['back_text']);
+            $category = sanitize_input($_POST['category']);
+            $difficulty = sanitize_input($_POST['difficulty']);
+            
+            $query = "UPDATE flashcards SET front_text = :front_text, back_text = :back_text, category = :category, difficulty = :difficulty WHERE id = :id AND user_id = :user_id";
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':id', $id);
+            $stmt->bindParam(':user_id', $_SESSION['user_id']);
+            $stmt->bindParam(':front_text', $front_text);
+            $stmt->bindParam(':back_text', $back_text);
+            $stmt->bindParam(':category', $category);
+            $stmt->bindParam(':difficulty', $difficulty);
+            $stmt->execute();
+            break;
+            
+        case 'delete_flashcard':
+            $id = $_POST['id'];
+            $query = "DELETE FROM flashcards WHERE id = :id AND user_id = :user_id";
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':id', $id);
             $stmt->bindParam(':user_id', $_SESSION['user_id']);
             $stmt->execute();
             break;
@@ -447,6 +542,130 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         </div>
                     </div>
                 </div>
+                
+                <!-- Custom Content Management -->
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <h3><i class="fas fa-heart"></i> Custom Compliments</h3>
+                        <p>Manage personalized compliments for the "How I See Her" page</p>
+                    </div>
+                    <div class="tool-content">
+                        <div class="content-form">
+                            <form method="POST" class="inline-form">
+                                <input type="hidden" name="action" value="add_custom_compliment">
+                                <div class="form-row">
+                                    <textarea name="content" placeholder="Add a new compliment..." required></textarea>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-plus"></i>
+                                        Add Compliment
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div class="content-list">
+                            <h4>Compliments</h4>
+                            <?php if (empty($custom_compliments)): ?>
+                                <p class="empty-state">No custom compliments yet. Add your first one above!</p>
+                            <?php else: ?>
+                                <?php foreach ($custom_compliments as $compliment): ?>
+                                    <div class="content-item">
+                                        <div class="content-text">
+                                            <p><?php echo htmlspecialchars($compliment['content']); ?></p>
+                                            <small class="content-meta">
+                                                Added <?php echo time_ago($compliment['created_at']); ?>
+                                                <?php if ($compliment['is_active']): ?>
+                                                    <span class="status active">Active</span>
+                                                <?php else: ?>
+                                                    <span class="status inactive">Inactive</span>
+                                                <?php endif; ?>
+                                            </small>
+                                        </div>
+                                        <div class="content-actions">
+                                            <form method="POST" class="inline-form">
+                                                <input type="hidden" name="action" value="toggle_compliment">
+                                                <input type="hidden" name="id" value="<?php echo $compliment['id']; ?>">
+                                                <input type="hidden" name="is_active" value="<?php echo $compliment['is_active'] ? '0' : '1'; ?>">
+                                                <button type="submit" class="btn-icon" title="<?php echo $compliment['is_active'] ? 'Deactivate' : 'Activate'; ?>">
+                                                    <i class="fas fa-<?php echo $compliment['is_active'] ? 'eye-slash' : 'eye'; ?>"></i>
+                                                </button>
+                                            </form>
+                                            <form method="POST" class="inline-form" onsubmit="return confirm('Are you sure you want to delete this compliment?')">
+                                                <input type="hidden" name="action" value="delete_compliment">
+                                                <input type="hidden" name="id" value="<?php echo $compliment['id']; ?>">
+                                                <button type="submit" class="btn-icon" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Daily Inspirations Management -->
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <h3><i class="fas fa-quote-left"></i> Daily Inspirations</h3>
+                        <p>Manage motivational quotes for the home page</p>
+                    </div>
+                    <div class="tool-content">
+                        <div class="content-form">
+                            <form method="POST" class="inline-form">
+                                <input type="hidden" name="action" value="add_custom_inspiration">
+                                <div class="form-row">
+                                    <textarea name="content" placeholder="Add a new daily inspiration..." required></textarea>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-plus"></i>
+                                        Add Inspiration
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div class="content-list">
+                            <h4>Daily Inspirations</h4>
+                            <?php if (empty($custom_inspirations)): ?>
+                                <p class="empty-state">No custom inspirations yet. Add your first one above!</p>
+                            <?php else: ?>
+                                <?php foreach ($custom_inspirations as $inspiration): ?>
+                                    <div class="content-item">
+                                        <div class="content-text">
+                                            <p><?php echo htmlspecialchars($inspiration['content']); ?></p>
+                                            <small class="content-meta">
+                                                Added <?php echo time_ago($inspiration['created_at']); ?>
+                                                <?php if ($inspiration['is_active']): ?>
+                                                    <span class="status active">Active</span>
+                                                <?php else: ?>
+                                                    <span class="status inactive">Inactive</span>
+                                                <?php endif; ?>
+                                            </small>
+                                        </div>
+                                        <div class="content-actions">
+                                            <form method="POST" class="inline-form">
+                                                <input type="hidden" name="action" value="toggle_inspiration">
+                                                <input type="hidden" name="id" value="<?php echo $inspiration['id']; ?>">
+                                                <input type="hidden" name="is_active" value="<?php echo $inspiration['is_active'] ? '0' : '1'; ?>">
+                                                <button type="submit" class="btn-icon" title="<?php echo $inspiration['is_active'] ? 'Deactivate' : 'Activate'; ?>">
+                                                    <i class="fas fa-<?php echo $inspiration['is_active'] ? 'eye-slash' : 'eye'; ?>"></i>
+                                                </button>
+                                            </form>
+                                            <form method="POST" class="inline-form" onsubmit="return confirm('Are you sure you want to delete this inspiration?')">
+                                                <input type="hidden" name="action" value="delete_inspiration">
+                                                <input type="hidden" name="id" value="<?php echo $inspiration['id']; ?>">
+                                                <button type="submit" class="btn-icon" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
             </section>
             <?php endif; ?>
             
@@ -590,6 +809,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <p>Create and review medical flashcards</p>
                     </div>
                     <div class="tool-content">
+                        <!-- Add Flashcard Form -->
+                        <div class="flashcard-form">
+                            <form method="POST" class="inline-form">
+                                <input type="hidden" name="action" value="add_flashcard">
+                                <div class="form-row">
+                                    <input type="text" name="front_text" placeholder="Front (e.g., What is ATP?)" required>
+                                    <input type="text" name="back_text" placeholder="Back (e.g., Adenosine Triphosphate)" required>
+                                </div>
+                                <div class="form-row">
+                                    <input type="text" name="category" placeholder="Category (e.g., Biochemistry)" required>
+                                    <select name="difficulty" required>
+                                        <option value="Easy">Easy</option>
+                                        <option value="Medium" selected>Medium</option>
+                                        <option value="Hard">Hard</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-plus"></i>
+                                        Add Card
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        
                         <div class="flashcard-stats">
                             <div class="stat-item">
                                 <div class="stat-number"><?php echo count($flashcards); ?></div>
@@ -602,12 +844,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <?php else: ?>
                             <div class="flashcard-grid">
                                 <?php foreach ($flashcards as $card): ?>
-                                    <div class="flashcard" onclick="flipCard(this)">
-                                        <div class="card-front">
-                                            <h4><?php echo htmlspecialchars($card['front_text']); ?></h4>
+                                    <div class="flashcard-container">
+                                        <div class="flashcard" onclick="flipCard(this)">
+                                            <div class="card-front">
+                                                <h4><?php echo htmlspecialchars($card['front_text']); ?></h4>
+                                                <div class="card-category"><?php echo htmlspecialchars($card['category']); ?></div>
+                                            </div>
+                                            <div class="card-back">
+                                                <h4><?php echo htmlspecialchars($card['back_text']); ?></h4>
+                                                <div class="card-difficulty"><?php echo htmlspecialchars($card['difficulty']); ?></div>
+                                            </div>
                                         </div>
-                                        <div class="card-back">
-                                            <h4><?php echo htmlspecialchars($card['back_text']); ?></h4>
+                                        <div class="flashcard-actions">
+                                            <button class="btn-icon" onclick="editFlashcard(<?php echo $card['id']; ?>, '<?php echo htmlspecialchars($card['front_text'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($card['back_text'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($card['category'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($card['difficulty'], ENT_QUOTES); ?>')" title="Edit Card">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-icon" onclick="deleteFlashcard(<?php echo $card['id']; ?>)" title="Delete Card">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
@@ -624,6 +878,90 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Flashcard flip functionality
         function flipCard(card) {
             card.classList.toggle('flipped');
+        }
+        
+        // Flashcard management functions
+        function editFlashcard(id, frontText, backText, category, difficulty) {
+            const modal = document.getElementById('editFlashcardModal');
+            if (!modal) {
+                createEditModal();
+            }
+            
+            document.getElementById('edit_card_id').value = id;
+            document.getElementById('edit_front_text').value = frontText;
+            document.getElementById('edit_back_text').value = backText;
+            document.getElementById('edit_category').value = category;
+            document.getElementById('edit_difficulty').value = difficulty;
+            
+            document.getElementById('editFlashcardModal').style.display = 'block';
+        }
+        
+        function deleteFlashcard(id) {
+            if (confirm('Are you sure you want to delete this flashcard?')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.innerHTML = `
+                    <input type="hidden" name="action" value="delete_flashcard">
+                    <input type="hidden" name="id" value="${id}">
+                `;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+        
+        function createEditModal() {
+            const modal = document.createElement('div');
+            modal.id = 'editFlashcardModal';
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Edit Flashcard</h3>
+                        <span class="close" onclick="closeEditModal()">&times;</span>
+                    </div>
+                    <form method="POST" class="modal-form">
+                        <input type="hidden" name="action" value="edit_flashcard">
+                        <input type="hidden" name="id" id="edit_card_id">
+                        <div class="form-group">
+                            <label>Front Text:</label>
+                            <input type="text" name="front_text" id="edit_front_text" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Back Text:</label>
+                            <input type="text" name="back_text" id="edit_back_text" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Category:</label>
+                            <input type="text" name="category" id="edit_category" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Difficulty:</label>
+                            <select name="difficulty" id="edit_difficulty" required>
+                                <option value="Easy">Easy</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Hard">Hard</option>
+                            </select>
+                        </div>
+                        <div class="modal-actions">
+                            <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        function closeEditModal() {
+            document.getElementById('editFlashcardModal').style.display = 'none';
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('editFlashcardModal');
+            if (event.target === modal) {
+                closeEditModal();
+            }
         }
         
         // Todo management functions

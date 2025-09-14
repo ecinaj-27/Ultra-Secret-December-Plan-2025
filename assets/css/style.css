@@ -3410,3 +3410,344 @@ body {
         height: 120px;
     }
 }
+
+/* Custom Content Management Styles */
+.content-form {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: var(--card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.content-form textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+    transition: border-color 0.3s ease;
+}
+
+.content-form textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.1);
+}
+
+.content-list h4 {
+    margin-bottom: 1rem;
+    color: var(--text-color);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.content-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    background: var(--card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.content-item:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(255, 105, 180, 0.1);
+}
+
+.content-text {
+    flex: 1;
+}
+
+.content-text p {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-color);
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.content-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.status {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.status.active {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+}
+
+.status.inactive {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.content-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.content-actions .inline-form {
+    margin: 0;
+}
+
+.content-actions .btn-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-color);
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.content-actions .btn-icon:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background: rgba(255, 105, 180, 0.05);
+}
+
+.content-actions .btn-icon:last-child:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.05);
+}
+
+/* Responsive adjustments for content management */
+@media (max-width: 768px) {
+    .content-item {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .content-actions {
+        align-self: flex-end;
+    }
+    
+    .content-form .form-row {
+        flex-direction: column;
+    }
+    
+    .content-form textarea {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Admin dropdown item styling */
+.dropdown-item.admin-dropdown-item {
+    background: rgba(255, 105, 180, 0.1);
+    border-left: 3px solid #ff69b4;
+    font-weight: 500;
+}
+
+.dropdown-item.admin-dropdown-item:hover {
+    background: rgba(255, 105, 180, 0.2);
+    border-left-color: #ff1493;
+}
+
+.dropdown-item.admin-dropdown-item i {
+    color: #ff69b4;
+}
+
+/* Enhanced Flashcard Styling */
+.card-back {
+    background: #f8f9fa !important;
+    border: 2px solid #ff69b4 !important;
+}
+
+.card-category,
+.card-difficulty {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(255, 105, 180, 0.1);
+    color: #ff69b4;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.card-difficulty {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+}
+
+/* Flashcard container with actions */
+.flashcard-container {
+    position: relative;
+    display: inline-block;
+}
+
+.flashcard-actions {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    display: flex;
+    gap: 5px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.flashcard-container:hover .flashcard-actions {
+    opacity: 1;
+}
+
+.flashcard-actions .btn-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-color);
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.flashcard-actions .btn-icon:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background: rgba(255, 105, 180, 0.05);
+}
+
+.flashcard-actions .btn-icon:last-child:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.05);
+}
+
+/* Modal styling for flashcard editing */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: var(--text-color);
+}
+
+.close {
+    color: var(--text-muted);
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close:hover {
+    color: var(--primary-color);
+}
+
+.modal-form {
+    padding: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-size: 1rem;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.1);
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Mobile responsive for flashcards */
+@media (max-width: 768px) {
+    .flashcard-actions {
+        opacity: 1;
+        position: static;
+        justify-content: center;
+        margin-top: 10px;
+    }
+    
+    .modal-content {
+        margin: 10% auto;
+        width: 95%;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+    }
+}

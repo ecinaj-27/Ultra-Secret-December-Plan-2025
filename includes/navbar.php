@@ -82,6 +82,13 @@ if (!isset($user) && isset($_SESSION['user_id'])) {
                                 <i class="fas fa-cog"></i>
                                 Settings
                             </a>
+                            <?php if (isset($user) && is_admin()): ?>
+                            <div class="dropdown-divider"></div>
+                            <a href="tools.php" class="dropdown-item admin-dropdown-item">
+                                <i class="fas fa-crown"></i>
+                                Content Management
+                            </a>
+                            <?php endif; ?>
                             <div class="dropdown-divider"></div>
                             <a href="logout.php" class="dropdown-item">
                                 <i class="fas fa-sign-out-alt"></i>
