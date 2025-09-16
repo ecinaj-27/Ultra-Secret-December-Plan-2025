@@ -12,10 +12,13 @@ $db = $database->getConnection();
 $is_admin = is_admin();
 
 // Get all posts (admin-uploaded content visible to all users)
-$query = "SELECT p.*, u.name as author_name FROM posts p 
+$query = "SELECT p.*, u.name as author_name, pr.is_read AS has_read
+          FROM posts p 
           JOIN users u ON p.user_id = u.id 
+          LEFT JOIN post_reads pr ON pr.post_id = p.id AND pr.user_id = :current_user_id
           ORDER BY p.created_at DESC";
 $stmt = $db->prepare($query);
+$stmt->bindParam(':current_user_id', $_SESSION['user_id']);
 $stmt->execute();
 $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -167,7 +170,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
                                  data-author="<?php echo htmlspecialchars($post['author_name']); ?>"
                                  data-date="<?php echo time_ago($post['created_at']); ?>">
                                 <div class="post-header">
-                                    <h3><?php echo htmlspecialchars($post['title']); ?></h3>
+                                    <h3><?php echo htmlspecialchars($post['title']); ?>
+                                        <?php if ($post['type'] === 'love_letter' && (is_null($post['has_read']) || !$post['has_read'])): ?>
+                                            <span class="badge badge-unread">Unread</span>
+                                        <?php endif; ?>
+                                    </h3>
                                     <div class="post-meta">
                                         <span class="post-type"><?php echo ucfirst(str_replace('_', ' ', $post['type'])); ?></span>
                                         <span class="post-author">by <?php echo htmlspecialchars($post['author_name']); ?></span>
@@ -318,7 +325,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         }
         
         // Expand post functionality
-        function expandPost(postId) {
+        async function expandPost(postId) {
             const postCard = document.querySelector(`[data-id="${postId}"]`);
             const lightbox = document.getElementById('post-lightbox');
             
@@ -332,6 +339,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
                 
                 // Show lightbox
                 lightbox.style.display = 'flex';
+
+                // Mark love letters as read when opened
+                if (postCard.dataset.type === 'love_letter') {
+                    try {
+                        await fetch('api/mark-post-read.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ post_id: postId })
+                        });
+                        const badge = postCard.querySelector('.badge-unread');
+                        if (badge) badge.remove();
+                    } catch (e) { /* ignore */ }
+                }
             }
         }
         

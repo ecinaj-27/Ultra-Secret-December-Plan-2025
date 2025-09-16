@@ -290,12 +290,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $content = sanitize_input($_POST['content']);
                 $scheduled_date = $_POST['scheduled_date'];
                 
-                $query = "INSERT INTO love_letters (title, content, scheduled_date, created_by) VALUES (:title, :content, :scheduled_date, :created_by)";
+                // Insert into the same table used for listing scheduled letters
+                $query = "INSERT INTO scheduled_letters (title, content, scheduled_date) VALUES (:title, :content, :scheduled_date)";
                 $stmt = $db->prepare($query);
                 $stmt->bindParam(':title', $title);
                 $stmt->bindParam(':content', $content);
                 $stmt->bindParam(':scheduled_date', $scheduled_date);
-                $stmt->bindParam(':created_by', $_SESSION['user_id']);
                 $stmt->execute();
             }
             break;
@@ -909,8 +909,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </section>
             
             <!-- MedBio Study Tools -->
-            <section class="study-section">
-                <h2><i class="fas fa-graduation-cap"></i> MedBio Study Tools</h2>
+            <!-- Section removed per request -->
+            <!-- <section class="study-section">
+                <h2><i class="fas fa-graduation-cap"></i> MedBio Study Tools</h2> -->
                 
                 <!-- Study Tracker -->
                 <div class="tool-card">
@@ -967,74 +968,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </div>
                 </div>
                 
-                <!-- Flashcards -->
-                <div class="tool-card">
-                    <div class="tool-header">
-                        <h3><i class="fas fa-cards-blank"></i> Flashcard Generator</h3>
-                        <p>Create and review medical flashcards</p>
-                    </div>
-                    <div class="tool-content">
-                        <!-- Add Flashcard Form -->
-                        <div class="flashcard-form">
-                            <form method="POST" class="inline-form">
-                                <input type="hidden" name="action" value="add_flashcard">
-                                <div class="form-row">
-                                    <input type="text" name="front_text" placeholder="Front (e.g., What is ATP?)" required>
-                                    <input type="text" name="back_text" placeholder="Back (e.g., Adenosine Triphosphate)" required>
-                                </div>
-                                <div class="form-row">
-                                    <input type="text" name="category" placeholder="Category (e.g., Biochemistry)" required>
-                                    <select name="difficulty" required>
-                                        <option value="Easy">Easy</option>
-                                        <option value="Medium" selected>Medium</option>
-                                        <option value="Hard">Hard</option>
-                                    </select>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-plus"></i>
-                                        Add Card
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                        
-                        <div class="flashcard-stats">
-                            <div class="stat-item">
-                                <div class="stat-number"><?php echo count($flashcards); ?></div>
-                                <div class="stat-label">Total Cards</div>
-                            </div>
-                        </div>
-                        
-                        <?php if (empty($flashcards)): ?>
-                            <p class="empty-state">No flashcards created yet. Start creating your medical study cards!</p>
-                        <?php else: ?>
-                            <div class="flashcard-grid">
-                                <?php foreach ($flashcards as $card): ?>
-                                    <div class="flashcard-container">
-                                        <div class="flashcard" onclick="flipCard(this)">
-                                            <div class="card-front">
-                                                <h4><?php echo htmlspecialchars($card['front_text']); ?></h4>
-                                                <div class="card-category"><?php echo htmlspecialchars($card['category']); ?></div>
-                                            </div>
-                                            <div class="card-back">
-                                                <h4><?php echo htmlspecialchars($card['back_text']); ?></h4>
-                                                <div class="card-difficulty"><?php echo htmlspecialchars($card['difficulty']); ?></div>
-                                            </div>
-                                        </div>
-                                        <div class="flashcard-actions">
-                                            <button class="btn-icon" onclick="editFlashcard(<?php echo $card['id']; ?>, '<?php echo htmlspecialchars($card['front_text'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($card['back_text'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($card['category'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($card['difficulty'], ENT_QUOTES); ?>')" title="Edit Card">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn-icon" onclick="deleteFlashcard(<?php echo $card['id']; ?>)" title="Delete Card">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </section>
+                <!-- Flashcards section removed per request -->
+            <!-- </section> -->
         </div>
     </main>
     

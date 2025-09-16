@@ -74,7 +74,7 @@ body {
     text-align: center;
     color: white;
     max-width: 1200px;
-    padding: 0.5rem;
+    padding: 2rem;
 }
 
 .logo-container {
@@ -343,33 +343,81 @@ body {
 
 /* Main Layout Styles */
 .main-content {
-    padding-top: 80px;
+    margin-left: 280px;
     min-height: 100vh;
     background: #f8f9fa;
+    transition: margin-left 0.3s ease;
 }
 
-/* Navbar Styles */
-.navbar {
+.main-content.sidebar-hidden {
+    margin-left: 0;
+}
+
+/* Sidebar Styles */
+.sidebar-toggle {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    background: #ffffff;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.sidebar-toggle:hover {
+    background: #f8f9fa;
+    border-color: #ffadad;
+    transform: translateY(-2px);
+}
+
+.sidebar-toggle i {
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.sidebar-toggle {
+    transition: all 0.3s ease;
+}
+
+/* Hide hamburger when sidebar is open */
+.sidebar-toggle.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-20px);
+}
+
+.sidebar {
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    background: rgb(255, 255, 255);
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    width: 280px;
+    height: 100vh;
+    background: #ffffff;
+    box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
     z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
     backdrop-filter: blur(10px);
 }
 
-.navbar-container {
-    max-width: 1200px;
-    padding: 0 2rem;
+.sidebar.hidden {
+    transform: translateX(-100%);
+}
+
+.sidebar-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 80px;
 }
 
-.navbar-brand a {
+.sidebar-brand a {
     display: flex;
     align-items: center;
     text-decoration: none;
@@ -377,57 +425,209 @@ body {
     font-weight: 700;
     font-size: 1.3rem;
 }
-.navbar-brand { flex: 0 0 auto; }
 
-.navbar-brand i {
+.sidebar-brand i {
     color: #ffadad;
     margin-right: 0.5rem;
     font-size: 1.5rem;
 }
 
-.navbar-menu {
-    display: flex;
+/* Admin shortcut under brand */
+.admin-shortcut {
+    margin-left: 1rem;
+    background: rgba(255, 105, 180, 0.1);
+    border: 1px solid #ff69b4;
+    color: #ff1493;
+    padding: 0.4rem 0.7rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
     align-items: center;
-    gap: 0;
-    flex: 1 1 auto;
+    gap: 6px;
 }
 
-.navbar-nav {
-    display: flex;
+.admin-shortcut:hover {
+    background: rgba(255, 105, 180, 0.2);
+}
+
+.sidebar-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #666;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.sidebar-close:hover {
+    background: #f8f9fa;
+    color: #ffadad;
+}
+
+.sidebar-menu {
+    flex: 1;
+    padding: 1rem 0 0 0;
+}
+
+.sidebar-nav {
     list-style: none;
-    gap: 5px;
     margin: 0;
     padding: 0;
-    flex: 1 1 auto;
-    width: 100%;
-    justify-content: space-between;
+}
+
+.sidebar-nav .nav-item {
+    margin: 0.25rem 1rem;
 }
 
 .nav-link {
     display: flex;
     align-items: center;
-    padding: 0.75rem 1.25rem;
+    padding: 1rem 1.25rem;
     text-decoration: none;
-    color: #555;
-    border-radius: 10px;
+    color: #333;
+    border-radius: 8px;
     transition: all 0.3s ease;
     font-weight: 500;
-    font-size: 0.95rem;
-    white-space: nowrap;
 }
 
 .nav-link:hover {
     background: #f8f9fa;
     color: #ffadad;
-    transform: translateY(-1px);
+    transform: translateX(4px);
     box-shadow: 0 2px 8px rgba(255, 173, 173, 0.15);
 }
 
 .nav-link i {
-    margin-right: 0.6rem;
+    margin-right: 0.75rem;
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar-user {
+    padding: 1rem 1rem 0.5rem 1rem;
+    border-top: none;
+}
+
+.sidebar-user .user-dropdown {
+    position: relative;
+}
+
+.sidebar-user .user-button {
+    display: flex;
+    align-items: center;
+    background: #9dbbef;
+    border: 1px solid #6bb8ff;
+    cursor: pointer;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    color: white;
+    text-decoration: none;
+    width: 100%;
+    box-shadow: 0 2px 8px rgba(255, 173, 173, 0.3);
+}
+
+.sidebar-user .user-button:hover {
+    background: #0a1b2c;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-color: #0a1b2c;
+}
+
+.sidebar-user .user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 0.75rem;
+    object-fit: cover;
+    border: 2px solid #f0f0f0;
+}
+
+.sidebar-user .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    padding: 0.5rem 0;
+    min-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1001;
+}
+
+.sidebar-user .user-dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.sidebar-user .dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem 1.2rem;
+    text-decoration: none;
+    color: #333;
+    transition: all 0.3s ease;
     font-size: 0.9rem;
+}
+
+.sidebar-user .dropdown-item:hover {
+    background: #f8f9fa;
+    color: #333;
+    transform: translateX(4px);
+}
+
+/* Admin dropdown item styling for sidebar */
+.sidebar-user .dropdown-item.admin-dropdown-item {
+    background: rgba(255, 105, 180, 0.1);
+    border-left: 3px solid #ff69b4;
+    font-weight: 500;
+}
+
+.sidebar-user .dropdown-item.admin-dropdown-item:hover {
+    background: rgba(255, 105, 180, 0.2);
+    border-left-color: #ff1493;
+    color: #ff69b4;
+}
+
+.sidebar-user .dropdown-item.admin-dropdown-item i {
+    color: #ff69b4;
+}
+
+.sidebar-user .dropdown-item i {
+    margin-right: 0.6rem;
     width: 16px;
     text-align: center;
+    font-size: 0.85rem;
+}
+
+.sidebar-user .dropdown-divider {
+    height: 1px;
+    background: #e1e5e9;
+    margin: 0.5rem 0;
+}
+
+/* Sidebar footer (logout at bottom) */
+.sidebar-footer {
+    border-top: 1px solid #e5e7eb;
+    padding: 0.75rem 1rem 1rem 1rem;
+}
+
+.sidebar-footer .nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.875rem 1rem;
 }
 
 /* User dropdown in navigation */
@@ -1040,65 +1240,49 @@ body {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .navbar-menu {
-        position: fixed;
-        top: 80px;
-        left: -100%;
+    .sidebar {
         width: 100%;
-        height: calc(100vh - 80px);
-        background: white;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: center;
-        padding: 2rem;
-        transition: left 0.3s ease;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        z-index: 1002;
     }
     
-    .navbar-menu.active {
-        left: 0;
+    .main-content {
+        margin-left: 0;
     }
     
-    .navbar-nav {
-        flex-direction: column;
-        width: 100%;
-        margin-bottom: 2rem;
+    .sidebar-toggle {
+        top: 15px;
+        left: 15px;
+        padding: 10px;
+    }
+    
+    .sidebar-toggle i {
+        font-size: 1rem;
+    }
+    
+    .sidebar-header {
+        padding: 1rem;
+    }
+    
+    .sidebar-brand a {
+        font-size: 1.1rem;
+    }
+    
+    .sidebar-nav .nav-item {
+        margin: 0.25rem 0.5rem;
     }
     
     .nav-link {
-        width: 100%;
-        justify-content: center;
-        padding: 1.2rem 1rem;
-        font-size: 1rem;
-        margin-bottom: 0.5rem;
+        padding: 0.875rem 1rem;
+        font-size: 0.95rem;
     }
     
-    .user-nav-item {
-        margin-left: 0;
-        margin-bottom: 0.5rem;
+    .sidebar-user {
+        padding: 0.75rem;
     }
     
-    .user-nav-item .user-button {
-        width: 100%;
-        justify-content: center;
-        padding: 1.2rem 1rem;
-        font-size: 1rem;
-    }
-    
-    .user-nav-item .dropdown-menu {
-        position: static;
-        opacity: 1;
-        visibility: visible;
-        transform: none;
-        box-shadow: none;
-        border: none;
-        background: #f8f9fa;
-        margin-top: 0.5rem;
-        border-radius: 8px;
-    }
-    
-    .navbar-toggle {
-        display: flex;
+    .sidebar-user .user-button {
+        padding: 0.625rem 0.875rem;
+        font-size: 0.9rem;
     }
     
     .landing-container {
