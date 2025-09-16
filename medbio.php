@@ -245,7 +245,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <h1><i class="fas fa-graduation-cap"></i> For My MedBio Bebe</h1>
                 <p>Your comprehensive medical study companion</p>
             </div>
-            
+            <section class="tool-launcher">
+                <div class="info-grid">
+                    <div class="info-card launcher" onclick="openModal('todoModal')">
+                        <i class="fas fa-tasks"></i>
+                        <h3>Study To-Do List</h3>
+                        <p>Add a study task</p>
+                    </div>
+                    <div class="info-card launcher" onclick="openModal('studyModal')">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Study Tracker</h3>
+                        <p>Log study hours</p>
+                    </div>
+                    <div class="info-card launcher" onclick="openModal('flashcardModal')">
+                        <i class="fas fa-cards-blank"></i>
+                        <h3>Flashcard Generator</h3>
+                        <p>Create a flashcard</p>
+                    </div>
+                    <div class="info-card launcher" onclick="openModal('labModal')">
+                        <i class="fas fa-microscope"></i>
+                        <h3>Lab Notebook</h3>
+                        <p>Add lab entry</p>
+                    </div>
+                    <div class="info-card launcher" onclick="openModal('resourceModal')">
+                        <i class="fas fa-archive"></i>
+                        <h3>Resource Vault</h3>
+                        <p>Upload a resource</p>
+                    </div>
+                </div>
+            </section>
             <!-- To-Do List -->
             <section class="todo-section">
                 <div class="tool-card">
@@ -254,26 +282,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <p>Manage your study tasks and assignments</p>
                     </div>
                     <div class="tool-content">
-                        <div class="todo-form">
-                            <form method="POST" class="inline-form">
-                                <input type="hidden" name="action" value="add_todo">
-                                <div class="form-row">
-                                    <input type="text" name="title" placeholder="Task title..." required>
-                                    <select name="category" required>
-                                        <option value="Lab">Lab</option>
-                                        <option value="School">School</option>
-                                        <option value="Personal">Personal</option>
-                                        <option value="Relationship">Relationship</option>
-                                    </select>
-                                    <input type="date" name="due_date">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-plus"></i>
-                                        Add Task
-                                    </button>
-                                </div>
-                                <textarea name="description" placeholder="Task description (optional)"></textarea>
-                            </form>
-                        </div>
                         
                         <div class="todo-list">
                             <?php if (empty($todo_items)): ?>
@@ -325,21 +333,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <p>Log your study hours and track progress</p>
                     </div>
                     <div class="tool-content">
-                        <div class="study-form">
-                            <form method="POST" class="inline-form">
-                                <input type="hidden" name="action" value="add_study_entry">
-                                <div class="form-row">
-                                    <input type="text" name="subject" placeholder="Subject (e.g., Biochemistry)" required>
-                                    <input type="number" name="hours" step="0.5" placeholder="Hours studied" required>
-                                    <input type="date" name="entry_date" value="<?php echo date('Y-m-d'); ?>" required>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-plus"></i>
-                                        Log Study
-                                    </button>
-                                </div>
-                                <textarea name="task_description" placeholder="What did you study? (optional)"></textarea>
-                            </form>
-                        </div>
+                        
                         
                         <div class="study-stats">
                             <div class="stat-item">
@@ -382,27 +376,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <p>Create and review medical flashcards</p>
                     </div>
                     <div class="tool-content">
-                        <div class="flashcard-form">
-                            <form method="POST" class="inline-form">
-                                <input type="hidden" name="action" value="add_flashcard">
-                                <div class="form-row">
-                                    <input type="text" name="front_text" placeholder="Front (e.g., What is ATP?)" required>
-                                    <input type="text" name="back_text" placeholder="Back (e.g., Adenosine Triphosphate)" required>
-                                </div>
-                                <div class="form-row">
-                                    <input type="text" name="category" placeholder="Category (e.g., Biochemistry)" required>
-                                    <select name="difficulty" required>
-                                        <option value="Easy">Easy</option>
-                                        <option value="Medium" selected>Medium</option>
-                                        <option value="Hard">Hard</option>
-                                    </select>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-plus"></i>
-                                        Add Card
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                        
                         
                         <div class="flashcard-stats">
                             <div class="stat-item">
@@ -451,23 +425,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <p>Digital space for lab observations and protocols</p>
                     </div>
                     <div class="tool-content">
-                        <div class="lab-form">
-                            <form method="POST" class="inline-form">
-                                <input type="hidden" name="action" value="add_lab_entry">
-                                <div class="form-row">
-                                    <input type="text" name="title" placeholder="Entry title" required>
-                                    <input type="date" name="entry_date" value="<?php echo date('Y-m-d'); ?>" required>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-plus"></i>
-                                        Add Entry
-                                    </button>
-                                </div>
-                                <div class="form-row">
-                                    <input type="text" name="tags" placeholder="Tags (e.g., Biochemistry, Lab Protocol)" required>
-                                </div>
-                                <textarea name="content" placeholder="Lab observations, protocols, results..." rows="4" required></textarea>
-                            </form>
-                        </div>
+                        
                         
                         <div class="lab-entries">
                             <h4>Recent Lab Entries</h4>
@@ -506,19 +464,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <p>Secure upload for lecture slides, notes, and PDFs</p>
                     </div>
                     <div class="tool-content">
-                        <div class="resource-upload">
-                            <form method="POST" enctype="multipart/form-data" class="inline-form">
-                                <input type="hidden" name="action" value="upload_resource">
-                                <div class="form-row">
-                                    <input type="file" name="resource_file" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt" required>
-                                    <input type="text" name="tags" placeholder="Tags (e.g., Biochem, Anatomy)" required>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-upload"></i>
-                                        Upload
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                        
                         
                         <div class="resource-search">
                             <input type="text" id="resource-search" placeholder="Search resources by tags..." onkeyup="searchResources(this.value)">
@@ -589,9 +535,179 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </section>
         </div>
     </main>
+    <!-- Modals: Quick forms -->
+    <div id="todoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add To-Do</h3>
+                <span class="close" onclick="closeModal('todoModal')">&times;</span>
+            </div>
+            <form method="POST" class="modal-form">
+                <input type="hidden" name="action" value="add_todo">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select name="category" required>
+                        <option value="Lab">Lab</option>
+                        <option value="School">School</option>
+                        <option value="Personal">Personal</option>
+                        <option value="Relationship">Relationship</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Due Date</label>
+                    <input type="date" name="due_date">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description" placeholder="Optional"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('todoModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="studyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Log Study</h3>
+                <span class="close" onclick="closeModal('studyModal')">&times;</span>
+            </div>
+            <form method="POST" class="modal-form">
+                <input type="hidden" name="action" value="add_study_entry">
+                <div class="form-group">
+                    <label>Subject</label>
+                    <input type="text" name="subject" required>
+                </div>
+                <div class="form-group">
+                    <label>Hours</label>
+                    <input type="number" name="hours" step="0.5" required>
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" name="entry_date" value="<?php echo date('Y-m-d'); ?>" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="task_description" placeholder="What did you study?"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('studyModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Log Study</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="flashcardModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create Flashcard</h3>
+                <span class="close" onclick="closeModal('flashcardModal')">&times;</span>
+            </div>
+            <form method="POST" class="modal-form">
+                <input type="hidden" name="action" value="add_flashcard">
+                <div class="form-group">
+                    <label>Front</label>
+                    <input type="text" name="front_text" required>
+                </div>
+                <div class="form-group">
+                    <label>Back</label>
+                    <input type="text" name="back_text" required>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <input type="text" name="category" required>
+                </div>
+                <div class="form-group">
+                    <label>Difficulty</label>
+                    <select name="difficulty" required>
+                        <option value="Easy">Easy</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="Hard">Hard</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('flashcardModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Card</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="labModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Lab Entry</h3>
+                <span class="close" onclick="closeModal('labModal')">&times;</span>
+            </div>
+            <form method="POST" class="modal-form">
+                <input type="hidden" name="action" value="add_lab_entry">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" name="entry_date" value="<?php echo date('Y-m-d'); ?>" required>
+                </div>
+                <div class="form-group">
+                    <label>Tags</label>
+                    <input type="text" name="tags" placeholder="Biochemistry, Protocol" required>
+                </div>
+                <div class="form-group">
+                    <label>Content</label>
+                    <textarea name="content" rows="4" required></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('labModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Entry</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="resourceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Upload Resource</h3>
+                <span class="close" onclick="closeModal('resourceModal')">&times;</span>
+            </div>
+            <form method="POST" enctype="multipart/form-data" class="modal-form">
+                <input type="hidden" name="action" value="upload_resource">
+                <div class="form-group">
+                    <label>File</label>
+                    <input type="file" name="resource_file" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.gif" required>
+                </div>
+                <div class="form-group">
+                    <label>Tags</label>
+                    <input type="text" name="tags" placeholder="Biochem, Anatomy" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('resourceModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
     
     <script src="assets/js/main.js"></script>
     <script>
+        // Modal helpers
+        function openModal(id) {
+            var m = document.getElementById(id);
+            if (m) m.style.display = 'block';
+        }
+        function closeModal(id) {
+            var m = document.getElementById(id);
+            if (m) m.style.display = 'none';
+        }
         // Flashcard flip functionality
         function flipCard(card) {
             card.classList.toggle('flipped');
@@ -679,6 +795,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (event.target === modal) {
                 closeEditModal();
             }
+            ['todoModal','studyModal','flashcardModal','labModal','resourceModal'].forEach(function(id){
+                var m = document.getElementById(id);
+                if (event.target === m) {
+                    m.style.display = 'none';
+                }
+            });
         }
         
         // Resource management functions

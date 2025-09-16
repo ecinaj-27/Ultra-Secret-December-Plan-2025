@@ -9,7 +9,10 @@ $user = get_user_data($_SESSION['user_id']);
 $countdown = get_anniversary_countdown();
 $quote = get_random_quote();
 $current_date = date('F j, Y');
+// Determine greeting
 $current_time = date('H:i:s');
+$hour = (int)date('H');
+$greeting = $hour < 12 ? 'morning' : ($hour < 18 ? 'afternoon' : 'evening');
 
 // Get recent to-do items
 $database = new Database();
@@ -19,6 +22,32 @@ $stmt = $db->prepare($query);
 $stmt->bindParam(':user_id', $_SESSION['user_id']);
 $stmt->execute();
 $todo_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Progress statistics and recent resources
+// Study totals
+$stmt = $db->prepare("SELECT COALESCE(SUM(hours_studied),0) AS total_hours, COUNT(*) AS sessions FROM study_entries WHERE user_id = :user_id");
+$stmt->bindParam(':user_id', $_SESSION['user_id']);
+$stmt->execute();
+$study_stats = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// Flashcards count
+$stmt = $db->prepare("SELECT COUNT(*) AS total_cards FROM flashcards WHERE user_id = :user_id");
+$stmt->bindParam(':user_id', $_SESSION['user_id']);
+$stmt->execute();
+$flashcard_stats = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// Todos completion
+$stmt = $db->prepare("SELECT SUM(CASE WHEN is_completed=1 THEN 1 ELSE 0 END) AS done, COUNT(*) AS total FROM todo_items WHERE user_id = :user_id");
+$stmt->bindParam(':user_id', $_SESSION['user_id']);
+$stmt->execute();
+$todo_stats = $stmt->fetch(PDO::FETCH_ASSOC);
+$todo_completion = ($todo_stats['total'] > 0) ? round(($todo_stats['done'] / $todo_stats['total']) * 100) : 0;
+
+// Recent resources
+$stmt = $db->prepare("SELECT id, original_name, file_path, uploaded_at, tags FROM resources WHERE user_id = :user_id ORDER BY uploaded_at DESC LIMIT 5");
+$stmt->bindParam(':user_id', $_SESSION['user_id']);
+$stmt->execute();
+$recent_resources = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,36 +66,14 @@ $todo_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="home-container">
             <!-- Greeting Section -->
             <div class="greeting-section">
-                <h1>Hi, <a href="profile.php" class="user-link"><?php echo htmlspecialchars($user['name']); ?></a></h1>
+                <h1>Good <?php echo $greeting; ?>, <a href="profile.php" class="user-link"><?php echo htmlspecialchars($user['name']); ?></a></h1>
                 <p class="current-date"><?php echo $current_date; ?></p>
+                <div class="time-display" id="live-time"></div>
             </div>
             
             <!-- Main Dashboard -->
             <div class="dashboard-grid">
-                <!-- Anniversary Countdown -->
-                <div class="dashboard-card countdown-card">
-                    <div class="card-header">
-                        <i class="fas fa-heart"></i>
-                        <h3>Anniversary Countdown</h3>
-                    </div>
-                    <div class="countdown-display">
-                        <div class="countdown-number"><?php echo $countdown; ?></div>
-                        <div class="countdown-label">days until our anniversary</div>
-                    </div>
-                </div>
-                
-                <!-- Live Time -->
-                <div class="dashboard-card time-card">
-                    <div class="card-header">
-                        <i class="fas fa-clock"></i>
-                        <h3>Current Time</h3>
-                    </div>
-                    <div class="time-display" id="live-time">
-                        <?php echo $current_time; ?>
-                    </div>
-                </div>
-                
-                <!-- Motivational Quote -->
+                <!-- Daily Inspiration -->
                 <div class="dashboard-card quote-card">
                     <div class="card-header">
                         <i class="fas fa-quote-left"></i>
@@ -109,15 +116,52 @@ $todo_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
                 
-                <!-- Photo Placeholder -->
-                <div class="dashboard-card photo-card">
+
+                <!-- Compact metrics below -->
+                
+                <!-- Statistics of Progress -->
+                <div class="dashboard-card stats-card compact">
                     <div class="card-header">
-                        <i class="fas fa-camera"></i>
-                        <h3>Photo of the Day</h3>
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Statistics of Progress</h3>
                     </div>
-                    <div class="photo-placeholder">
-                        <i class="fas fa-image"></i>
-                        <p>Photo placeholder</p>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number"><?php echo (int)$study_stats['total_hours']; ?></div>
+                            <div class="stat-label">Study Hours</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number"><?php echo (int)$study_stats['sessions']; ?></div>
+                            <div class="stat-label">Study Sessions</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number"><?php echo (int)$flashcard_stats['total_cards']; ?></div>
+                            <div class="stat-label">Flashcards</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number"><?php echo $todo_completion; ?>%</div>
+                            <div class="stat-label">To-Do Completion</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Added Resources -->
+                <div class="dashboard-card resources-card compact">
+                    <div class="card-header">
+                        <i class="fas fa-archive"></i>
+                        <h3>Recent Added Resources</h3>
+                    </div>
+                    <div>
+                        <?php if (empty($recent_resources)): ?>
+                            <p class="no-todos">No resources yet</p>
+                        <?php else: ?>
+                            <?php foreach ($recent_resources as $res): ?>
+                                <div class="todo-item">
+                                    <span class="todo-text"><?php echo htmlspecialchars($res['original_name']); ?></span>
+                                    <span class="todo-category"><?php echo htmlspecialchars(explode(',', $res['tags'])[0] ?? ''); ?></span>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

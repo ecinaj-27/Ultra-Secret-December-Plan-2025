@@ -40,6 +40,44 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
                 exit();
             }
         }
+    } elseif ($action === 'edit_photo') {
+        $id = (int)($_POST['id'] ?? 0);
+        $caption = sanitize_input($_POST['caption'] ?? '');
+        // optional image replacement
+        $stmt = $db->prepare("SELECT image_path FROM photo_booth WHERE id = :id");
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+        $image_path = $existing ? $existing['image_path'] : null;
+        if (isset($_FILES['photo']) && $_FILES['photo']['error'] == 0) {
+            $new_path = upload_file($_FILES['photo'], 'uploads/photo_booth/');
+            if ($new_path) {
+                if ($image_path) { delete_file_if_exists($image_path); }
+                $image_path = $new_path;
+            }
+        }
+        $query = "UPDATE photo_booth SET caption = :caption, image_path = :image_path WHERE id = :id";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':caption', $caption);
+        $stmt->bindParam(':image_path', $image_path);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        header('Location: photo-booth.php?updated=1');
+        exit();
+    } elseif ($action === 'delete_photo') {
+        $id = (int)($_POST['id'] ?? 0);
+        $stmt = $db->prepare("SELECT image_path FROM photo_booth WHERE id = :id");
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($existing && $existing['image_path']) {
+            delete_file_if_exists($existing['image_path']);
+        }
+        $stmt = $db->prepare("DELETE FROM photo_booth WHERE id = :id");
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        header('Location: photo-booth.php?deleted=1');
+        exit();
     }
 }
 ?>
@@ -334,6 +372,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
                                     <?php echo format_date($photo['uploaded_at']); ?>
                                 </div>
                             </div>
+                            <?php if ($is_admin): ?>
+                            <div class="admin-actions" style="position:absolute;top:8px;right:8px;display:flex;gap:6px;z-index:5;">
+                                <button class="btn-icon" title="Edit" onclick="openEditPhoto(<?php echo $photo['id']; ?>, `<?php echo htmlspecialchars($photo['caption'], ENT_QUOTES); ?>`)" style="background:#fff;border:1px solid #e1e5e9;border-radius:6px;padding:6px;cursor:pointer;"><i class="fas fa-edit"></i></button>
+                                <button class="btn-icon" title="Delete" onclick="deletePhoto(<?php echo $photo['id']; ?>)" style="background:#fff;border:1px solid #e1e5e9;border-radius:6px;padding:6px;cursor:pointer;"><i class="fas fa-trash"></i></button>
+                            </div>
+                            <?php endif; ?>
                         </div>
                     <?php else: ?>
                         <div class="photo-item empty">
@@ -359,6 +403,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
                 <div id="lightbox-caption"></div>
                 <div id="lightbox-date"></div>
             </div>
+        </div>
+    </div>
+    
+    <!-- Edit Photo Modal -->
+    <div id="editPhotoModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Photo</h3>
+                <span class="close" onclick="closeEditPhoto()">&times;</span>
+            </div>
+            <form method="POST" enctype="multipart/form-data" class="modal-form">
+                <input type="hidden" name="action" value="edit_photo">
+                <input type="hidden" name="id" id="edit_photo_id">
+                <div class="form-group">
+                    <label>Caption</label>
+                    <textarea name="caption" id="edit_photo_caption" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Replace Photo (optional)</label>
+                    <input type="file" name="photo" accept="image/*">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditPhoto()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
         </div>
     </div>
     
@@ -398,6 +468,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
                 }
             });
         });
+        
+        function openEditPhoto(id, caption) {
+            document.getElementById('edit_photo_id').value = id;
+            document.getElementById('edit_photo_caption').value = caption || '';
+            document.getElementById('editPhotoModal').style.display = 'block';
+        }
+        function closeEditPhoto() {
+            const modal = document.getElementById('editPhotoModal');
+            if (modal) modal.style.display = 'none';
+        }
+        function deletePhoto(id) {
+            if (!confirm('Delete this photo?')) return;
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.innerHTML = `
+                <input type="hidden" name="action" value="delete_photo">
+                <input type="hidden" name="id" value="${id}">
+            `;
+            document.body.appendChild(form);
+            form.submit();
+        }
     </script>
     
     <style>

@@ -43,6 +43,48 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
                 exit();
             }
         }
+    } elseif ($action === 'edit_art') {
+        $id = (int)($_POST['id'] ?? 0);
+        $title = sanitize_input($_POST['title'] ?? '');
+        $description = sanitize_input($_POST['description'] ?? '');
+        $story = sanitize_input($_POST['story'] ?? '');
+        // fetch existing
+        $stmt = $db->prepare("SELECT image_path FROM art_items WHERE id = :id");
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+        $image_path = $existing ? $existing['image_path'] : null;
+        if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+            $new_path = upload_file($_FILES['image'], 'uploads/art_wall/');
+            if ($new_path) {
+                if ($image_path) { delete_file_if_exists($image_path); }
+                $image_path = $new_path;
+            }
+        }
+        $query = "UPDATE art_items SET title = :title, description = :description, story = :story, image_path = :image_path WHERE id = :id";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':title', $title);
+        $stmt->bindParam(':description', $description);
+        $stmt->bindParam(':story', $story);
+        $stmt->bindParam(':image_path', $image_path);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        header('Location: art-wall.php?updated=1');
+        exit();
+    } elseif ($action === 'delete_art') {
+        $id = (int)($_POST['id'] ?? 0);
+        $stmt = $db->prepare("SELECT image_path FROM art_items WHERE id = :id");
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($existing && $existing['image_path']) {
+            delete_file_if_exists($existing['image_path']);
+        }
+        $stmt = $db->prepare("DELETE FROM art_items WHERE id = :id");
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        header('Location: art-wall.php?deleted=1');
+        exit();
     }
 }
 ?>
@@ -455,6 +497,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
                                     <div class="art-description-static"><?php echo htmlspecialchars($art['description']); ?></div>
                                 <?php endif; ?>
                             </div>
+                            <?php if ($is_admin): ?>
+                            <div class="admin-actions" style="position:absolute;top:8px;right:8px;display:flex;gap:6px;z-index:5;">
+                                <button class="btn-icon" title="Edit" onclick="openEditArt(<?php echo $art['id']; ?>, `<?php echo htmlspecialchars($art['title'], ENT_QUOTES); ?>`, `<?php echo htmlspecialchars($art['description'] ?? '', ENT_QUOTES); ?>`, `<?php echo htmlspecialchars($art['story'] ?? '', ENT_QUOTES); ?>`)" style="background:#fff;border:1px solid #e1e5e9;border-radius:6px;padding:6px;cursor:pointer;"><i class="fas fa-edit"></i></button>
+                                <button class="btn-icon" title="Delete" onclick="deleteArt(<?php echo $art['id']; ?>)" style="background:#fff;border:1px solid #e1e5e9;border-radius:6px;padding:6px;cursor:pointer;"><i class="fas fa-trash"></i></button>
+                            </div>
+                            <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -475,6 +523,40 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
                 <p id="art-popup-description"></p>
                 <div id="art-popup-story"></div>
             </div>
+        </div>
+    </div>
+    
+    <!-- Edit Art Modal -->
+    <div id="editArtModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Artwork</h3>
+                <span class="close" onclick="closeEditArt()">&times;</span>
+            </div>
+            <form method="POST" enctype="multipart/form-data" class="modal-form">
+                <input type="hidden" name="action" value="edit_art">
+                <input type="hidden" name="id" id="edit_art_id">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="title" id="edit_art_title" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description" id="edit_art_description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Story / Message</label>
+                    <textarea name="story" id="edit_art_story" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Replace Image (optional)</label>
+                    <input type="file" name="image" accept="image/*">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditArt()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
         </div>
     </div>
     
@@ -510,6 +592,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
                 document.getElementById('art-popup').style.display = 'none';
             }
         });
+        
+        function openEditArt(id, title, description, story) {
+            document.getElementById('edit_art_id').value = id;
+            document.getElementById('edit_art_title').value = title || '';
+            document.getElementById('edit_art_description').value = description || '';
+            document.getElementById('edit_art_story').value = story || '';
+            document.getElementById('editArtModal').style.display = 'block';
+        }
+        function closeEditArt() {
+            const modal = document.getElementById('editArtModal');
+            if (modal) modal.style.display = 'none';
+        }
+        function deleteArt(id) {
+            if (!confirm('Delete this artwork?')) return;
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.innerHTML = `
+                <input type="hidden" name="action" value="delete_art">
+                <input type="hidden" name="id" value="${id}">
+            `;
+            document.body.appendChild(form);
+            form.submit();
+        }
     </script>
 </body>
 </html>

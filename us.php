@@ -74,7 +74,7 @@ $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <main class="main-content">
         <div class="us-container">
             <div class="page-header">
-                <h1>Our Story</h1>
+                <h1>Us</h1>
                 <p>Every moment, every memory, every place we've been together</p>
                 <?php if (isset($_GET['updated'])): ?>
                     <div class="alert alert-success">Content updated successfully!</div>
@@ -136,6 +136,28 @@ $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </section>
             <?php endif; ?>
             
+            <!-- Our Story content shown on Us page -->
+            <section class="about-section active">
+                <div class="section-content">
+                    <div class="section-header">
+                        <h2><i class="fas fa-book-heart"></i> Our Story</h2>
+                    </div>
+                    <div class="story-content">
+                        <?php if (!empty($content['our_story']['content'])): ?>
+                            <div class="story-text">
+                                <?php echo nl2br(htmlspecialchars($content['our_story']['content'])); ?>
+                            </div>
+                        <?php else: ?>
+                            <div class="story-text">
+                                <p>Our journey started on a beautiful day and keeps getting better.</p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </section>
+
+            
+
             <!-- Relationship Timeline -->
             <section class="timeline-section">
                 <div class="section-header">

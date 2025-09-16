@@ -41,6 +41,66 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
         header('Location: media.php?success=1');
         exit();
     }
+    
+    if ($action === 'edit_media') {
+        $id = (int)($_POST['id'] ?? 0);
+        $title = sanitize_input($_POST['title']);
+        $type = sanitize_input($_POST['type']);
+        $description = sanitize_input($_POST['description']);
+        $rating = (int)$_POST['rating'];
+        $external_link = sanitize_input($_POST['external_link']);
+        $spotify_embed = $_POST['spotify_embed'] ?? '';
+        
+        // Fetch existing image
+        $stmt = $db->prepare("SELECT image_path FROM media_items WHERE id = :id");
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+        $image_path = $existing ? $existing['image_path'] : null;
+        
+        if ($type !== 'song') {
+            if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+                $new_path = upload_file($_FILES['image'], 'uploads/media/');
+                if ($new_path) {
+                    if ($image_path) { delete_file_if_exists($image_path); }
+                    $image_path = $new_path;
+                }
+            }
+        } else {
+            $image_path = null; // songs don't use images
+        }
+        
+        $query = "UPDATE media_items SET title = :title, type = :type, description = :description, rating = :rating, external_link = :external_link, spotify_embed = :spotify_embed, image_path = :image_path WHERE id = :id";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':title', $title);
+        $stmt->bindParam(':type', $type);
+        $stmt->bindParam(':description', $description);
+        $stmt->bindParam(':rating', $rating);
+        $stmt->bindParam(':external_link', $external_link);
+        $stmt->bindParam(':spotify_embed', $spotify_embed);
+        $stmt->bindParam(':image_path', $image_path);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        
+        header('Location: media.php?updated=1');
+        exit();
+    }
+    
+    if ($action === 'delete_media') {
+        $id = (int)($_POST['id'] ?? 0);
+        $stmt = $db->prepare("SELECT image_path FROM media_items WHERE id = :id");
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($existing && $existing['image_path']) {
+            delete_file_if_exists($existing['image_path']);
+        }
+        $stmt = $db->prepare("DELETE FROM media_items WHERE id = :id");
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        header('Location: media.php?deleted=1');
+        exit();
+    }
 }
 
 // Get media items
@@ -203,6 +263,12 @@ $series = array_filter($media_items, function($item) { return $item['type'] === 
                                         </a>
                                     <?php endif; ?>
                                 </div>
+                                <?php if ($is_admin): ?>
+                                <div class="admin-actions">
+                                    <button class="btn-icon" onclick="openEditMedia(<?php echo $movie['id']; ?>, '<?php echo htmlspecialchars($movie['title'], ENT_QUOTES); ?>', 'movie', '<?php echo htmlspecialchars($movie['description'], ENT_QUOTES); ?>', <?php echo (int)$movie['rating']; ?>, '<?php echo htmlspecialchars($movie['external_link'], ENT_QUOTES); ?>', '')"><i class="fas fa-edit"></i></button>
+                                    <button class="btn-icon" onclick="deleteMedia(<?php echo $movie['id']; ?>)"><i class="fas fa-trash"></i></button>
+                                </div>
+                                <?php endif; ?>
                             </div>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -254,6 +320,12 @@ $series = array_filter($media_items, function($item) { return $item['type'] === 
                                         </a>
                                     <?php endif; ?>
                                 </div>
+                                <?php if ($is_admin): ?>
+                                <div class="admin-actions">
+                                    <button class="btn-icon" onclick="openEditMedia(<?php echo $show['id']; ?>, '<?php echo htmlspecialchars($show['title'], ENT_QUOTES); ?>', 'series', '<?php echo htmlspecialchars($show['description'], ENT_QUOTES); ?>', <?php echo (int)$show['rating']; ?>, '<?php echo htmlspecialchars($show['external_link'], ENT_QUOTES); ?>', '')"><i class="fas fa-edit"></i></button>
+                                    <button class="btn-icon" onclick="deleteMedia(<?php echo $show['id']; ?>)"><i class="fas fa-trash"></i></button>
+                                </div>
+                                <?php endif; ?>
                             </div>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -368,6 +440,12 @@ $series = array_filter($media_items, function($item) { return $item['type'] === 
                                             <?php endif; ?>
                                         </div>
                                     <?php endif; ?>
+                                    <?php if ($is_admin): ?>
+                                    <div class="admin-actions">
+                                        <button class="btn-icon" onclick="openEditMedia(<?php echo $song['id']; ?>, '<?php echo htmlspecialchars($song['title'], ENT_QUOTES); ?>', 'song', '<?php echo htmlspecialchars($song['description'], ENT_QUOTES); ?>', <?php echo (int)$song['rating']; ?>, '<?php echo htmlspecialchars($song['external_link'], ENT_QUOTES); ?>', `<?php echo str_replace('`', '\`', $song['spotify_embed']); ?>`)"><i class="fas fa-edit"></i></button>
+                                        <button class="btn-icon" onclick="deleteMedia(<?php echo $song['id']; ?>)"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                    <?php endif; ?>
                                 </div>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -398,6 +476,104 @@ $series = array_filter($media_items, function($item) { return $item['type'] === 
         function toggleAdminForm() {
             const form = document.getElementById('admin-form');
             form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+        // Media edit/delete
+        function ensureEditModal() {
+            if (document.getElementById('editMediaModal')) return;
+            const modal = document.createElement('div');
+            modal.id = 'editMediaModal';
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Edit Media</h3>
+                        <span class="close" onclick="closeEditMedia()">&times;</span>
+                    </div>
+                    <form method="POST" enctype="multipart/form-data" class="modal-form">
+                        <input type="hidden" name="action" value="edit_media">
+                        <input type="hidden" name="id" id="edit_media_id">
+                        <div class="form-group">
+                            <label>Title</label>
+                            <input type="text" name="title" id="edit_media_title" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Type</label>
+                            <select name="type" id="edit_media_type" required>
+                                <option value="movie">Movie</option>
+                                <option value="series">Series</option>
+                                <option value="song">Song</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea name="description" id="edit_media_description" rows="3"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Rating</label>
+                                <select name="rating" id="edit_media_rating" required>
+                                    <option value="5">5</option>
+                                    <option value="4">4</option>
+                                    <option value="3">3</option>
+                                    <option value="2">2</option>
+                                    <option value="1">1</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>External Link</label>
+                                <input type="url" name="external_link" id="edit_media_link">
+                            </div>
+                        </div>
+                        <div class="form-group" id="edit_media_spotify_group" style="display:none;">
+                            <label>Spotify Embed Code</label>
+                            <textarea name="spotify_embed" id="edit_media_spotify" rows="4"></textarea>
+                        </div>
+                        <div class="form-group" id="edit_media_image_group">
+                            <label>Replace Image</label>
+                            <input type="file" name="image" accept="image/*">
+                        </div>
+                        <div class="modal-actions">
+                            <button type="button" class="btn btn-secondary" onclick="closeEditMedia()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>`;
+            document.body.appendChild(modal);
+        }
+        function openEditMedia(id, title, type, description, rating, link, spotify) {
+            ensureEditModal();
+            document.getElementById('edit_media_id').value = id;
+            document.getElementById('edit_media_title').value = title;
+            document.getElementById('edit_media_type').value = type;
+            document.getElementById('edit_media_description').value = description;
+            document.getElementById('edit_media_rating').value = String(rating);
+            document.getElementById('edit_media_link').value = link || '';
+            const spotifyGroup = document.getElementById('edit_media_spotify_group');
+            if (type === 'song') {
+                spotifyGroup.style.display = 'block';
+                document.getElementById('edit_media_spotify').value = spotify || '';
+                document.getElementById('edit_media_image_group').style.display = 'none';
+            } else {
+                spotifyGroup.style.display = 'none';
+                document.getElementById('edit_media_spotify').value = '';
+                document.getElementById('edit_media_image_group').style.display = 'block';
+            }
+            document.getElementById('editMediaModal').style.display = 'block';
+        }
+        function closeEditMedia() {
+            const modal = document.getElementById('editMediaModal');
+            if (modal) modal.style.display = 'none';
+        }
+        function deleteMedia(id) {
+            if (!confirm('Delete this media item?')) return;
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.innerHTML = `
+                <input type="hidden" name="action" value="delete_media">
+                <input type="hidden" name="id" value="${id}">
+            `;
+            document.body.appendChild(form);
+            form.submit();
         }
         
         // Playlist form toggle

@@ -150,6 +150,57 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
             break;
             
+        case 'edit_timeline_event':
+            if ($is_admin) {
+                $id = (int)($_POST['id'] ?? 0);
+                $title = sanitize_input($_POST['title'] ?? '');
+                $description = sanitize_input($_POST['description'] ?? '');
+                $event_date = $_POST['event_date'] ?? null;
+                $caption = sanitize_input($_POST['caption'] ?? '');
+                
+                // Fetch existing to handle image replacement
+                $stmt = $db->prepare("SELECT image_path FROM timeline_events WHERE id = :id");
+                $stmt->bindParam(':id', $id);
+                $stmt->execute();
+                $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+                $image_path = $existing ? $existing['image_path'] : '';
+                
+                if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+                    $new_path = upload_file($_FILES['image'], 'uploads/timeline/');
+                    if ($new_path) {
+                        if ($image_path) { delete_file_if_exists($image_path); }
+                        $image_path = $new_path;
+                    }
+                }
+                
+                $query = "UPDATE timeline_events SET title = :title, description = :description, event_date = :event_date, caption = :caption, image_path = :image_path WHERE id = :id";
+                $stmt = $db->prepare($query);
+                $stmt->bindParam(':title', $title);
+                $stmt->bindParam(':description', $description);
+                $stmt->bindParam(':event_date', $event_date);
+                $stmt->bindParam(':caption', $caption);
+                $stmt->bindParam(':image_path', $image_path);
+                $stmt->bindParam(':id', $id);
+                $stmt->execute();
+            }
+            break;
+        
+        case 'delete_timeline_event':
+            if ($is_admin) {
+                $id = (int)($_POST['id'] ?? 0);
+                $stmt = $db->prepare("SELECT image_path FROM timeline_events WHERE id = :id");
+                $stmt->bindParam(':id', $id);
+                $stmt->execute();
+                $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($existing && $existing['image_path']) {
+                    delete_file_if_exists($existing['image_path']);
+                }
+                $stmt = $db->prepare("DELETE FROM timeline_events WHERE id = :id");
+                $stmt->bindParam(':id', $id);
+                $stmt->execute();
+            }
+            break;
+            
         case 'add_location':
             if ($is_admin) {
                 $name = sanitize_input($_POST['name']);
@@ -174,6 +225,61 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $stmt->bindParam(':longitude', $longitude);
                 $stmt->bindParam(':visit_date', $visit_date);
                 $stmt->bindParam(':image_path', $image_path);
+                $stmt->execute();
+            }
+            break;
+        
+        case 'edit_location':
+            if ($is_admin) {
+                $id = (int)($_POST['id'] ?? 0);
+                $name = sanitize_input($_POST['name'] ?? '');
+                $description = sanitize_input($_POST['description'] ?? '');
+                $caption = sanitize_input($_POST['caption'] ?? '');
+                $latitude = $_POST['latitude'] ?? null;
+                $longitude = $_POST['longitude'] ?? null;
+                $visit_date = $_POST['visit_date'] ?? null;
+                
+                // Fetch existing
+                $stmt = $db->prepare("SELECT image_path FROM locations WHERE id = :id");
+                $stmt->bindParam(':id', $id);
+                $stmt->execute();
+                $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+                $image_path = $existing ? $existing['image_path'] : '';
+                
+                if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+                    $new_path = upload_file($_FILES['image'], 'uploads/locations/');
+                    if ($new_path) {
+                        if ($image_path) { delete_file_if_exists($image_path); }
+                        $image_path = $new_path;
+                    }
+                }
+                
+                $query = "UPDATE locations SET name = :name, description = :description, caption = :caption, latitude = :latitude, longitude = :longitude, visit_date = :visit_date, image_path = :image_path WHERE id = :id";
+                $stmt = $db->prepare($query);
+                $stmt->bindParam(':name', $name);
+                $stmt->bindParam(':description', $description);
+                $stmt->bindParam(':caption', $caption);
+                $stmt->bindParam(':latitude', $latitude);
+                $stmt->bindParam(':longitude', $longitude);
+                $stmt->bindParam(':visit_date', $visit_date);
+                $stmt->bindParam(':image_path', $image_path);
+                $stmt->bindParam(':id', $id);
+                $stmt->execute();
+            }
+            break;
+        
+        case 'delete_location':
+            if ($is_admin) {
+                $id = (int)($_POST['id'] ?? 0);
+                $stmt = $db->prepare("SELECT image_path FROM locations WHERE id = :id");
+                $stmt->bindParam(':id', $id);
+                $stmt->execute();
+                $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($existing && $existing['image_path']) {
+                    delete_file_if_exists($existing['image_path']);
+                }
+                $stmt = $db->prepare("DELETE FROM locations WHERE id = :id");
+                $stmt->bindParam(':id', $id);
                 $stmt->execute();
             }
             break;
@@ -215,6 +321,55 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $stmt->bindParam(':story', $story);
                     $stmt->execute();
                 }
+            }
+            break;
+        
+        case 'edit_art':
+            if ($is_admin) {
+                $id = (int)($_POST['id'] ?? 0);
+                $title = sanitize_input($_POST['title'] ?? '');
+                $description = sanitize_input($_POST['description'] ?? '');
+                $story = sanitize_input($_POST['story'] ?? '');
+                
+                // Fetch existing
+                $stmt = $db->prepare("SELECT image_path FROM art_items WHERE id = :id");
+                $stmt->bindParam(':id', $id);
+                $stmt->execute();
+                $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+                $image_path = $existing ? $existing['image_path'] : '';
+                
+                if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+                    $new_path = upload_file($_FILES['image'], 'uploads/art_wall/');
+                    if ($new_path) {
+                        if ($image_path) { delete_file_if_exists($image_path); }
+                        $image_path = $new_path;
+                    }
+                }
+                
+                $query = "UPDATE art_items SET title = :title, description = :description, image_path = :image_path, story = :story WHERE id = :id";
+                $stmt = $db->prepare($query);
+                $stmt->bindParam(':title', $title);
+                $stmt->bindParam(':description', $description);
+                $stmt->bindParam(':image_path', $image_path);
+                $stmt->bindParam(':story', $story);
+                $stmt->bindParam(':id', $id);
+                $stmt->execute();
+            }
+            break;
+        
+        case 'delete_art':
+            if ($is_admin) {
+                $id = (int)($_POST['id'] ?? 0);
+                $stmt = $db->prepare("SELECT image_path FROM art_items WHERE id = :id");
+                $stmt->bindParam(':id', $id);
+                $stmt->execute();
+                $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($existing && $existing['image_path']) {
+                    delete_file_if_exists($existing['image_path']);
+                }
+                $stmt = $db->prepare("DELETE FROM art_items WHERE id = :id");
+                $stmt->bindParam(':id', $id);
+                $stmt->execute();
             }
             break;
             
@@ -457,7 +612,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                             <?php endif; ?>
                                         </div>
                                         <div class="timeline-actions">
-                                            <button class="btn-icon" onclick="editTimelineEvent(<?php echo $event['id']; ?>)">
+                                            <button class="btn-icon" onclick="openEditTimelineEvent(<?php echo $event['id']; ?>, '<?php echo htmlspecialchars($event['title'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($event['description'] ?? '', ENT_QUOTES); ?>', '<?php echo htmlspecialchars($event['event_date'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($event['caption'] ?? '', ENT_QUOTES); ?>')">
                                                 <i class="fas fa-edit"></i>
                                             </button>
                                             <button class="btn-icon" onclick="deleteTimelineEvent(<?php echo $event['id']; ?>)">
@@ -529,7 +684,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                             <?php endif; ?>
                                         </div>
                                         <div class="location-actions">
-                                            <button class="btn-icon" onclick="editLocation(<?php echo $location['id']; ?>)">
+                                            <button class="btn-icon" onclick="openEditLocation(<?php echo $location['id']; ?>, '<?php echo htmlspecialchars($location['name'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($location['description'] ?? '', ENT_QUOTES); ?>', '<?php echo htmlspecialchars($location['caption'] ?? '', ENT_QUOTES); ?>', '<?php echo htmlspecialchars($location['latitude'] ?? '', ENT_QUOTES); ?>', '<?php echo htmlspecialchars($location['longitude'] ?? '', ENT_QUOTES); ?>', '<?php echo htmlspecialchars($location['visit_date'] ?? '', ENT_QUOTES); ?>')">
                                                 <i class="fas fa-edit"></i>
                                             </button>
                                             <button class="btn-icon" onclick="deleteLocation(<?php echo $location['id']; ?>)">
@@ -727,6 +882,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                                 </div>
                                             <?php endif; ?>
                                         </div>
+                                        <?php if ($is_admin): ?>
+                                        <div class="art-actions">
+                                            <button class="btn-icon" onclick="openEditArt(<?php echo $art['id']; ?>, '<?php echo htmlspecialchars($art['title'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($art['description'] ?? '', ENT_QUOTES); ?>', '<?php echo htmlspecialchars($art['story'] ?? '', ENT_QUOTES); ?>')" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn-icon" onclick="deleteArt(<?php echo $art['id']; ?>)" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        <?php endif; ?>
                                     </div>
                                 <?php endforeach; ?>
                                 <?php if (count($art_items) > 6): ?>
@@ -962,6 +1127,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (event.target === modal) {
                 closeEditModal();
             }
+            const tModal = document.getElementById('editTimelineModal');
+            if (event.target === tModal) {
+                closeTimelineModal();
+            }
+            const lModal = document.getElementById('editLocationModal');
+            if (event.target === lModal) {
+                closeLocationModal();
+            }
+            const aModal = document.getElementById('editArtModal');
+            if (event.target === aModal) {
+                closeArtModal();
+            }
         }
         
         // Todo management functions
@@ -971,6 +1148,69 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             form.innerHTML = `
                 <input type="hidden" name="action" value="toggle_todo">
                 <input type="hidden" name="todo_id" value="${todoId}">
+            `;
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        // Art management
+        function ensureArtModal() {
+            if (document.getElementById('editArtModal')) return;
+            const modal = document.createElement('div');
+            modal.id = 'editArtModal';
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Edit Artwork</h3>
+                        <span class="close" onclick="closeArtModal()">&times;</span>
+                    </div>
+                    <form method="POST" enctype="multipart/form-data" class="modal-form">
+                        <input type="hidden" name="action" value="edit_art">
+                        <input type="hidden" name="id" id="edit_art_id">
+                        <div class="form-group">
+                            <label>Title</label>
+                            <input type="text" name="title" id="edit_art_title" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea name="description" id="edit_art_description"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Story</label>
+                            <textarea name="story" id="edit_art_story"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Replace Image</label>
+                            <input type="file" name="image" accept="image/*">
+                        </div>
+                        <div class="modal-actions">
+                            <button type="button" class="btn btn-secondary" onclick="closeArtModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>`;
+            document.body.appendChild(modal);
+        }
+        function openEditArt(id, title, description, story) {
+            ensureArtModal();
+            document.getElementById('edit_art_id').value = id;
+            document.getElementById('edit_art_title').value = title;
+            document.getElementById('edit_art_description').value = description || '';
+            document.getElementById('edit_art_story').value = story || '';
+            document.getElementById('editArtModal').style.display = 'block';
+        }
+        function closeArtModal() {
+            const modal = document.getElementById('editArtModal');
+            if (modal) modal.style.display = 'none';
+        }
+        function deleteArt(id) {
+            if (!confirm('Are you sure you want to delete this artwork?')) return;
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.innerHTML = `
+                <input type="hidden" name="action" value="delete_art">
+                <input type="hidden" name="id" value="${id}">
             `;
             document.body.appendChild(form);
             form.submit();
@@ -1004,27 +1244,151 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         
         // Timeline management functions
-        function editTimelineEvent(eventId) {
-            alert('Edit timeline event functionality coming soon!');
+        function ensureTimelineModal() {
+            if (document.getElementById('editTimelineModal')) return;
+            const modal = document.createElement('div');
+            modal.id = 'editTimelineModal';
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Edit Timeline Event</h3>
+                        <span class="close" onclick="closeTimelineModal()">&times;</span>
+                    </div>
+                    <form method="POST" enctype="multipart/form-data" class="modal-form">
+                        <input type="hidden" name="action" value="edit_timeline_event">
+                        <input type="hidden" name="id" id="edit_timeline_id">
+                        <div class="form-group">
+                            <label>Title</label>
+                            <input type="text" name="title" id="edit_timeline_title" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" name="event_date" id="edit_timeline_date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea name="description" id="edit_timeline_description"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Caption</label>
+                            <textarea name="caption" id="edit_timeline_caption"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Replace Image</label>
+                            <input type="file" name="image" accept="image/*">
+                        </div>
+                        <div class="modal-actions">
+                            <button type="button" class="btn btn-secondary" onclick="closeTimelineModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>`;
+            document.body.appendChild(modal);
         }
-        
-        function deleteTimelineEvent(eventId) {
-            if (confirm('Are you sure you want to delete this timeline event?')) {
-                // Add AJAX call to delete timeline event
-                alert('Delete timeline event functionality coming soon!');
-            }
+        function openEditTimelineEvent(id, title, description, date, caption) {
+            ensureTimelineModal();
+            document.getElementById('edit_timeline_id').value = id;
+            document.getElementById('edit_timeline_title').value = title;
+            document.getElementById('edit_timeline_description').value = description || '';
+            document.getElementById('edit_timeline_date').value = date || '';
+            document.getElementById('edit_timeline_caption').value = caption || '';
+            document.getElementById('editTimelineModal').style.display = 'block';
+        }
+        function closeTimelineModal() {
+            const modal = document.getElementById('editTimelineModal');
+            if (modal) modal.style.display = 'none';
+        }
+        function deleteTimelineEvent(id) {
+            if (!confirm('Are you sure you want to delete this timeline event?')) return;
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.innerHTML = `
+                <input type="hidden" name="action" value="delete_timeline_event">
+                <input type="hidden" name="id" value="${id}">
+            `;
+            document.body.appendChild(form);
+            form.submit();
         }
         
         // Location management functions
-        function editLocation(locationId) {
-            alert('Edit location functionality coming soon!');
+        function ensureLocationModal() {
+            if (document.getElementById('editLocationModal')) return;
+            const modal = document.createElement('div');
+            modal.id = 'editLocationModal';
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Edit Location</h3>
+                        <span class="close" onclick="closeLocationModal()">&times;</span>
+                    </div>
+                    <form method="POST" enctype="multipart/form-data" class="modal-form">
+                        <input type="hidden" name="action" value="edit_location">
+                        <input type="hidden" name="id" id="edit_location_id">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" name="name" id="edit_location_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" name="visit_date" id="edit_location_date" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Latitude</label>
+                                <input type="text" name="latitude" id="edit_location_lat">
+                            </div>
+                            <div class="form-group">
+                                <label>Longitude</label>
+                                <input type="text" name="longitude" id="edit_location_lng">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea name="description" id="edit_location_description"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Caption</label>
+                            <textarea name="caption" id="edit_location_caption"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Replace Image</label>
+                            <input type="file" name="image" accept="image/*">
+                        </div>
+                        <div class="modal-actions">
+                            <button type="button" class="btn btn-secondary" onclick="closeLocationModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>`;
+            document.body.appendChild(modal);
         }
-        
-        function deleteLocation(locationId) {
-            if (confirm('Are you sure you want to delete this location?')) {
-                // Add AJAX call to delete location
-                alert('Delete location functionality coming soon!');
-            }
+        function openEditLocation(id, name, description, caption, lat, lng, date) {
+            ensureLocationModal();
+            document.getElementById('edit_location_id').value = id;
+            document.getElementById('edit_location_name').value = name;
+            document.getElementById('edit_location_description').value = description || '';
+            document.getElementById('edit_location_caption').value = caption || '';
+            document.getElementById('edit_location_lat').value = lat || '';
+            document.getElementById('edit_location_lng').value = lng || '';
+            document.getElementById('edit_location_date').value = date || '';
+            document.getElementById('editLocationModal').style.display = 'block';
+        }
+        function closeLocationModal() {
+            const modal = document.getElementById('editLocationModal');
+            if (modal) modal.style.display = 'none';
+        }
+        function deleteLocation(id) {
+            if (!confirm('Are you sure you want to delete this location?')) return;
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.innerHTML = `
+                <input type="hidden" name="action" value="delete_location">
+                <input type="hidden" name="id" value="${id}">
+            `;
+            document.body.appendChild(form);
+            form.submit();
         }
     </script>
 </body>

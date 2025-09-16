@@ -1,4 +1,3 @@
-
 * {
     margin: 0;
     padding: 0;
@@ -11,6 +10,55 @@ body {
     color: #333;
     background: linear-gradient(135deg, #a0c4ff 0%, #bdb2ff 100%);
     min-height: 100vh;
+}
+
+:root {
+    --bg-color: #ffffff;
+    --card-bg: #ffffff;
+    --text-color: #333333;
+    --text-muted: #6b7280;
+    --border-color: #e5e7eb;
+    --primary-color: #ff69b4;
+}
+
+/* Wide layout overrides */
+@media (min-width: 992px) {
+    .navbar-container,
+    .home-container,
+    .profile-container,
+    .media-container,
+    .us-container,
+    .tools-container,
+    .about-container,
+    .medbio-container {
+        max-width: 100vw;
+    }
+    .home-container,
+    .profile-container,
+    .media-container,
+    .us-container,
+    .tools-container,
+    .about-container,
+    .medbio-container {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+    .navbar-container {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+}
+
+/* Make dashboard cards spread more on wide screens */
+.dashboard-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+
+@media (min-width: 1400px) {
+    .large-card {
+        grid-column: span 3;
+        grid-row: span 2;
+    }
 }
 
 /* Landing Page Styles */
@@ -329,6 +377,7 @@ body {
     font-weight: 700;
     font-size: 1.3rem;
 }
+.navbar-brand { flex: 0 0 auto; }
 
 .navbar-brand i {
     color: #ffadad;
@@ -339,7 +388,8 @@ body {
 .navbar-menu {
     display: flex;
     align-items: center;
-    gap: 3rem;
+    gap: 0;
+    flex: 1 1 auto;
 }
 
 .navbar-nav {
@@ -348,6 +398,9 @@ body {
     gap: 5px;
     margin: 0;
     padding: 0;
+    flex: 1 1 auto;
+    width: 100%;
+    justify-content: space-between;
 }
 
 .nav-link {
@@ -475,6 +528,10 @@ body {
 
 .navbar-user {
     position: relative;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
 }
 
 .user-dropdown {
@@ -664,17 +721,80 @@ body {
 }
 
 .countdown-number {
-    font-size: 4rem;
+    font-size: 2.6rem;
     font-weight: 700;
     color: #ffadad;
     line-height: 1;
 }
 
 .countdown-label {
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     color: #666;
     margin-top: 0.5rem;
 }
+
+/* Floating countdown icon */
+.floating-countdown {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    width: 56px;
+    height: 56px;
+    background: #1565c0;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    cursor: pointer;
+    z-index: 1200;
+    border: 3px solid #1976d2;
+}
+.floating-countdown i {
+    font-size: 22px;
+}
+.floating-countdown .floating-label {
+    position: absolute;
+    right: 60px;
+    background: #6b7280;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+.floating-countdown:hover .floating-label {
+    opacity: 1;
+    transform: translateX(0);
+}
+.floating-countdown .floating-popover {
+    position: absolute;
+    right: 70px;
+    bottom: 0;
+    background: white;
+    color: #333;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    width: 260px;
+    padding: 12px 14px;
+    display: none;
+}
+.floating-countdown:hover .floating-popover {
+    display: block;
+}
+.floating-countdown .popover-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+.floating-countdown .popover-header i { color: #ff6b6b; }
+.floating-countdown .popover-body { text-align: center; }
 
 .time-display {
     font-size: 2.5rem;
@@ -1666,6 +1786,18 @@ body {
     color: #ffadad;
     margin-bottom: 0.5rem;
 }
+.dashboard-card.compact {
+    padding: 1.25rem;
+}
+.countdown-card.compact .countdown-number {
+    font-size: 3rem;
+}
+.stats-card.compact .stat-number {
+    font-size: 2.2rem;
+}
+.resources-card.compact .todo-item { padding: 0.5rem 0; }
+.resources-card.compact .todo-text { font-size: 0.95rem; }
+.resources-card.compact .todo-category { font-size: 0.75rem; }
 
 .stat-label {
     color: #666;
@@ -3271,6 +3403,7 @@ body {
     padding: 1.5rem;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
+    position: relative;
 }
 
 .spotify-track-card:hover {
@@ -3312,6 +3445,8 @@ body {
 
 .spotify-embed {
     margin-top: 1rem;
+    position: relative;
+    z-index: 1;
 }
 
 .spotify-embed iframe {
@@ -3319,6 +3454,20 @@ body {
     width: 100%;
     height: 152px;
 }
+
+/* Ensure admin edit/delete buttons are clickable above embeds */
+.spotify-track-card .admin-actions {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 5;
+    background: rgba(255,255,255,0.9);
+    border-radius: 8px;
+}
+
+/* Ensure iframes don't capture clicks over controls */
+.spotify-embed iframe { pointer-events: auto; }
+.spotify-track-card .admin-actions, .spotify-track-card .admin-actions * { pointer-events: auto; }
 
 .no-embed {
     text-align: center;
@@ -3648,22 +3797,25 @@ body {
 .modal {
     display: none;
     position: fixed;
-    z-index: 1000;
+    z-index: 1100;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(2px);
 }
 
 .modal-content {
     background-color: var(--card-bg);
-    margin: 5% auto;
+    margin: 2% auto;
     padding: 0;
     border-radius: 12px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    width: min(90vw, 700px);
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-color);
 }
 
 .modal-header {
@@ -3717,8 +3869,23 @@ body {
     font-size: 1rem;
 }
 
+.modal-form .form-group textarea,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-size: 1rem;
+    min-height: 120px;
+    resize: vertical;
+}
+
 .form-group input:focus,
-.form-group select:focus {
+.form-group select:focus,
+.modal-form .form-group textarea:focus,
+.form-group textarea:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.1);
@@ -3733,6 +3900,14 @@ body {
     border-top: 1px solid var(--border-color);
 }
 
+/* Admin inline actions (edit/delete) */
+.admin-actions {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem 1rem;
+    justify-content: flex-end;
+}
+
 /* Mobile responsive for flashcards */
 @media (max-width: 768px) {
     .flashcard-actions {
@@ -3743,11 +3918,52 @@ body {
     }
     
     .modal-content {
-        margin: 10% auto;
-        width: 95%;
+        margin: 5% auto;
+        width: 95vw;
+        max-height: 90vh;
     }
     
     .modal-actions {
         flex-direction: column;
     }
 }
+
+/* MedBio Tool Launcher */
+.tool-launcher {
+    margin-bottom: 2rem;
+}
+.launcher-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+}
+.launcher-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.launcher-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+}
+.launcher-card i {
+    font-size: 1.6rem;
+    color: #4CAF50;
+    margin-bottom: 0.5rem;
+}
+.launcher-card h3 {
+    font-size: 1.05rem;
+    color: #333;
+    margin-bottom: 0.25rem;
+}
+.launcher-card p {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.info-card.launcher { cursor: pointer; }
+.info-card.launcher i { color: #4CAF50; }

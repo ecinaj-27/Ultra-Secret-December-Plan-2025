@@ -60,16 +60,8 @@ function get_random_quote() {
     
     // Fallback to hardcoded quotes
     $quotes = [
-        "You are my today and all of my tomorrows.",
-        "In all the world, there is no heart for me like yours.",
-        "I love you not only for what you are, but for what I am when I am with you.",
-        "You make me want to be a better person.",
-        "Every love story is beautiful, but ours is my favorite.",
-        "I have found the one whom my soul loves.",
-        "You are my sunshine on a cloudy day.",
-        "I love you more than words can express.",
-        "You are the reason I believe in love.",
-        "My heart is and always will be yours."
+        "That's all for today, folks!",
+ 
     ];
     
     return $quotes[array_rand($quotes)];
@@ -95,16 +87,7 @@ function get_random_compliment() {
     
     // Fallback to hardcoded compliments
     $compliments = [
-        "Your smile could light up the darkest room.",
-        "You have the most beautiful eyes I've ever seen.",
-        "Your laugh is my favorite sound in the world.",
-        "You make everything better just by being you.",
-        "Your kindness touches everyone around you.",
-        "You are incredibly intelligent and wise.",
-        "Your creativity never ceases to amaze me.",
-        "You have the most caring heart.",
-        "Your strength inspires me every day.",
-        "You are absolutely perfect just as you are."
+        "That's all for today, folks!"
     ];
     
     return $compliments[array_rand($compliments)];
@@ -138,6 +121,18 @@ function upload_file($file, $upload_dir = 'uploads/') {
         return $upload_path;
     }
     
+    return false;
+}
+
+function delete_file_if_exists($file_path) {
+    if (!$file_path) return false;
+    try {
+        if (file_exists($file_path)) {
+            return unlink($file_path);
+        }
+    } catch (Exception $e) {
+        return false;
+    }
     return false;
 }
 
