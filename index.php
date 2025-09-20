@@ -39,24 +39,6 @@ if (is_logged_in()) {
                 Register
             </a>
         </div>
-        
-        <div class="landing-features">
-            <div class="feature">
-                <i class="fas fa-calendar-heart"></i>
-                <h3>Anniversary Tracker</h3>
-                <p>Never miss a special moment</p>
-            </div>
-            <div class="feature">
-                <i class="fas fa-images"></i>
-                <h3>Memory Lane</h3>
-                <p>Cherish every moment together</p>
-            </div>
-            <div class="feature">
-                <i class="fas fa-graduation-cap"></i>
-                <h3>Study Buddy</h3>
-                <p>Track your medical studies</p>
-            </div>
-        </div>
     </div>
     
     <script src="assets/js/main.js"></script>

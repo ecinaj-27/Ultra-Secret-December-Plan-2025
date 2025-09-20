@@ -46,15 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         <!-- Main content -->
         <div class="passcode-content">
-            <!-- Header -->
-            <div class="passcode-header">
-                <div class="logo">
-                    <i class="fas fa-heart"></i>
-                </div>
-                <h1>Our Secret Place</h1>
-                <p>Enter your passcode to continue</p>
-            </div>
-            
             <!-- Username Selection -->
             <div class="username-section" id="username-section">
                 <h2>Select User</h2>
