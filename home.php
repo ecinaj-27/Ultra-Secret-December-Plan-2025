@@ -9,10 +9,18 @@ $user = get_user_data($_SESSION['user_id']);
 $countdown = get_anniversary_countdown();
 $quote = get_random_quote();
 $current_date = date('F j, Y');
-// Determine greeting
-$current_time = date('H:i:s');
+// Determine greeting based on current time
+// Use date_default_timezone_get() to ensure we're using the server's timezone
 $hour = (int)date('H');
-$greeting = $hour < 12 ? 'morning' : ($hour < 18 ? 'afternoon' : 'evening');
+if ($hour >= 5 && $hour < 12) {
+    $greeting = 'morning';
+} elseif ($hour >= 12 && $hour < 17) {
+    $greeting = 'afternoon';
+} elseif ($hour >= 17 && $hour < 21) {
+    $greeting = 'evening';
+} else {
+    $greeting = 'evening'; // Default to evening for late night/early morning (21:00-04:59)
+}
 
 // Get recent to-do items
 $database = new Database();

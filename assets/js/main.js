@@ -570,7 +570,7 @@ style.textContent = `
     }
     
     .calendar-day.today {
-        background: #4CAF50;
+        background: #2196F3;
         color: white;
         font-weight: 600;
     }
@@ -598,7 +598,7 @@ style.textContent = `
     }
     
     .calendar-nav-btn {
-        background: #4CAF50;
+        background: #2196F3;
         color: white;
         border: none;
         padding: 0.5rem;
@@ -613,11 +613,11 @@ style.textContent = `
     }
     
     .calendar-nav-btn:hover {
-        background: #45a049;
+        background: #1976D2;
     }
     
     .calendar-expand-btn {
-        background: #4CAF50;
+        background: #2196F3;
         color: white;
         border: none;
         padding: 0.5rem;
@@ -632,7 +632,7 @@ style.textContent = `
     }
     
     .calendar-expand-btn:hover {
-        background: #45a049;
+        background: #1976D2;
     }
     
     .calendar-expanded {
@@ -659,13 +659,13 @@ style.textContent = `
         padding: 1rem;
         margin-bottom: 0.5rem;
         border-radius: 6px;
-        border-left: 4px solid #4CAF50;
+        border-left: 4px solid #2196F3;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     
     .calendar-todo-item.completed {
         opacity: 0.6;
-        border-left-color: #4CAF50;
+        border-left-color: #2196F3;
     }
     
     .calendar-todo-item h6 {
@@ -681,7 +681,7 @@ style.textContent = `
     }
     
     .calendar-todo-item .todo-category {
-        background: #4CAF50;
+        background: #2196F3;
         color: white;
         padding: 0.25rem 0.5rem;
         border-radius: 12px;

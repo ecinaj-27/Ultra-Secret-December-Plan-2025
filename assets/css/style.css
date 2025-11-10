@@ -67,6 +67,52 @@ body.dark-mode .tool-card {
     border: 1px solid #555 !important;
 }
 
+/* Dark mode text readability improvements */
+body.dark-mode .greeting-section h1 {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+body.dark-mode .current-date {
+    color: #e0e0e0;
+    font-weight: 500;
+}
+
+body.dark-mode .time-display {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+body.dark-mode .quote-content p {
+    color: #e0e0e0;
+    font-weight: 400;
+}
+
+body.dark-mode .card-header h3 {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+body.dark-mode .todo-text {
+    color: #e0e0e0;
+}
+
+body.dark-mode .stat-label {
+    color: #b0b0b0;
+}
+
+body.dark-mode .stat-number {
+    color: #ffffff;
+}
+
+body.dark-mode .todo-category {
+    color: #ffffff;
+}
+
+body.dark-mode .no-todos {
+    color: #b0b0b0;
+}
+
 body.dark-mode .profile-card,
 body.dark-mode .profile-content,
 body.dark-mode .profile-form,
@@ -148,7 +194,7 @@ body.dark-mode .post-card.post-love_letter {
 }
 
 body.dark-mode .post-card.post-note {
-    border-left: 4px solid #4CAF50;
+    border-left: 4px solid #2196F3;
 }
 
 body.dark-mode .post-card.post-compliment {
@@ -246,7 +292,7 @@ body.dark-mode .calendar-day:hover {
 }
 
 body.dark-mode .calendar-day.today {
-    background: #4CAF50;
+    background: #42b8dc;
     color: white;
 }
 
@@ -1193,8 +1239,9 @@ body.dark-mode .track-description {
 
 .greeting-section h1 {
     font-size: 2.5rem;
-    color: #333;
+    color: #1a1a1a;
     margin-bottom: 0.5rem;
+    font-weight: 600;
 }
 
 .user-link {
@@ -1209,7 +1256,8 @@ body.dark-mode .track-description {
 
 .current-date {
     font-size: 1.1rem;
-    color: #666;
+    color: #444;
+    font-weight: 500;
 }
 
 .dashboard-grid {
@@ -1246,7 +1294,8 @@ body.dark-mode .track-description {
 
 .card-header h3 {
     font-size: 1.3rem;
-    color: #333;
+    color: #1a1a1a;
+    font-weight: 600;
 }
 
 .view-all {
@@ -1344,8 +1393,8 @@ body.dark-mode .track-description {
 
 .time-display {
     font-size: 2.5rem;
-    font-weight: 600;
-    color: #333;
+    font-weight: 700;
+    color: #1a1a1a;
     text-align: center;
     font-family: 'Courier New', monospace;
 }
@@ -1356,9 +1405,10 @@ body.dark-mode .track-description {
 
 .quote-content p {
     font-size: 1.1rem;
-    color: #666;
+    color: #444;
     font-style: italic;
-    line-height: 1.6;
+    line-height: 1.8;
+    font-weight: 400;
 }
 
 .calendar-widget {
@@ -1384,8 +1434,9 @@ body.dark-mode .track-description {
 }
 
 .todo-text {
-    color: #333;
+    color: #1a1a1a;
     flex: 1;
+    font-weight: 500;
 }
 
 .todo-category {
@@ -1399,9 +1450,10 @@ body.dark-mode .track-description {
 
 .no-todos {
     text-align: center;
-    color: #999;
+    color: #666;
     font-style: italic;
     padding: 2rem 0;
+    font-weight: 400;
 }
 
 /* Post Lightbox Styles */
@@ -2363,8 +2415,9 @@ body.dark-mode .timeline-dot-label {
 .resources-card.compact .todo-category { font-size: 0.75rem; }
 
 .stat-label {
-    color: #666;
+    color: #444;
     font-size: 1.1rem;
+    font-weight: 500;
 }
 
 /* Lightbox Styles */
@@ -2479,9 +2532,27 @@ body.dark-mode .timeline-dot-label {
 
 .posts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 280px));
+    grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
     justify-content: center;
+}
+
+@media (max-width: 1200px) {
+    .posts-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .posts-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .posts-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .post-card {
@@ -2490,7 +2561,7 @@ body.dark-mode .timeline-dot-label {
     padding: 1.5rem;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
-    width: 280px;
+    width: 100%;
     min-height: 280px;
     max-height: 400px;
     display: flex;
@@ -2507,7 +2578,7 @@ body.dark-mode .timeline-dot-label {
 }
 
 .post-card.post-note {
-    border-left: 4px solid #4CAF50;
+    border-left: 4px solid #2196F3;
 }
 
 .post-card.post-compliment {
@@ -2959,7 +3030,7 @@ body.dark-mode .timeline-dot-label {
 }
 
 .features-list li i {
-    color: #4CAF50;
+    color: #2196F3;
     font-size: 1.2rem;
 }
 
@@ -3233,7 +3304,7 @@ body.dark-mode .story-text p {
 }
 
 .wish-category {
-    background: #4CAF50;
+    background: #2196F3;
     color: white;
     padding: 0.25rem 0.75rem;
     border-radius: 15px;
@@ -3313,7 +3384,7 @@ body.dark-mode .story-text p {
 }
 
 .study-section h2 i {
-    color: #4CAF50;
+    color: #2196F3;
 }
 
 .study-stats {
@@ -3333,7 +3404,7 @@ body.dark-mode .story-text p {
 .study-stats .stat-number {
     font-size: 2rem;
     font-weight: 700;
-    color: #4CAF50;
+    color: #2196F3;
     margin-bottom: 0.5rem;
 }
 
@@ -3459,7 +3530,7 @@ body.dark-mode .story-text p {
 }
 
 .status.sent {
-    background: #4CAF50;
+    background: #2196F3;
     color: white;
 }
 
@@ -3728,7 +3799,7 @@ body.dark-mode .story-text p {
 }
 
 .medbio-container .page-header h1 i {
-    color: #4CAF50;
+    color: #2196F3;
 }
 
 .study-section,
@@ -3801,7 +3872,7 @@ body.dark-mode .story-text p {
 .flashcard-stats .stat-number {
     font-size: 2rem;
     font-weight: 700;
-    color: #4CAF50;
+    color: #2196F3;
     margin-bottom: 0.5rem;
 }
 
@@ -3859,7 +3930,7 @@ body.dark-mode .story-text p {
 }
 
 .tag {
-    background: #4CAF50;
+    background: #2196F3;
     color: white;
     padding: 0.25rem 0.75rem;
     border-radius: 15px;
@@ -3933,7 +4004,7 @@ body.dark-mode .story-text p {
 
 .resource-search input:focus {
     outline: none;
-    border-color: #4CAF50;
+    border-color: #2196F3;
 }
 
 .resource-list {
@@ -3958,7 +4029,7 @@ body.dark-mode .story-text p {
 .resource-icon {
     width: 50px;
     height: 50px;
-    background: #4CAF50;
+    background: #2196F3;
     border-radius: 10px;
     display: flex;
     align-items: center;
@@ -3992,7 +4063,7 @@ body.dark-mode .story-text p {
 }
 
 .resource-actions .btn-icon {
-    background: #4CAF50;
+    background: #2196F3;
     color: white;
     border: none;
     padding: 0.5rem;
@@ -4591,7 +4662,7 @@ body.dark-mode .story-text p {
 }
 .launcher-card i {
     font-size: 1.6rem;
-    color: #4CAF50;
+    color: #2196F3;
     margin-bottom: 0.5rem;
 }
 .launcher-card h3 {

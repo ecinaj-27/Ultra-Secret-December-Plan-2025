@@ -97,7 +97,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
     <link rel="stylesheet" href="assets/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/masonry-layout@4.2.2/dist/masonry.pkgd.min.css">
 </head>
 <body>
     <?php include 'includes/navbar.php'; ?>
@@ -318,20 +317,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
     </div>
     <?php endif; ?>
     
-    <script src="https://unpkg.com/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script>
     <script src="assets/js/main.js"></script>
     <script>
-        // Initialize masonry layout
-        document.addEventListener('DOMContentLoaded', function() {
-            const grid = document.getElementById('posts-grid');
-            if (grid) {
-                new Masonry(grid, {
-                    itemSelector: '.post-card',
-                    columnWidth: 300,
-                    gutter: 20
-                });
-            }
-        });
         
         // Compliment generator
         let compliments = [];
