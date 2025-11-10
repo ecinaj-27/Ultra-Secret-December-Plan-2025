@@ -25,27 +25,66 @@ $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Get random compliment
 $compliment = get_random_compliment();
 
-// Handle new post creation (admin only)
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] === 'create_post') {
+// Handle post actions (admin only)
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
     if (!$is_admin) {
         header('Location: how-i-see-her.php?error=unauthorized');
         exit();
     }
     
-    $title = sanitize_input($_POST['title']);
-    $content = sanitize_input($_POST['content']);
-    $type = sanitize_input($_POST['type']);
+    $action = $_POST['action'];
     
-    $query = "INSERT INTO posts (user_id, title, content, type) VALUES (:user_id, :title, :content, :type)";
-    $stmt = $db->prepare($query);
-    $stmt->bindParam(':user_id', $_SESSION['user_id']);
-    $stmt->bindParam(':title', $title);
-    $stmt->bindParam(':content', $content);
-    $stmt->bindParam(':type', $type);
-    
-    if ($stmt->execute()) {
-        header('Location: how-i-see-her.php?success=1');
-        exit();
+    if ($action === 'create_post') {
+        $title = sanitize_input($_POST['title']);
+        $content = sanitize_input($_POST['content']);
+        $type = sanitize_input($_POST['type']);
+        
+        $query = "INSERT INTO posts (user_id, title, content, type) VALUES (:user_id, :title, :content, :type)";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':user_id', $_SESSION['user_id']);
+        $stmt->bindParam(':title', $title);
+        $stmt->bindParam(':content', $content);
+        $stmt->bindParam(':type', $type);
+        
+        if ($stmt->execute()) {
+            header('Location: how-i-see-her.php?success=1');
+            exit();
+        }
+    } elseif ($action === 'edit_post') {
+        $id = (int)($_POST['id'] ?? 0);
+        $title = sanitize_input($_POST['title']);
+        $content = sanitize_input($_POST['content']);
+        $type = sanitize_input($_POST['type']);
+        
+        $query = "UPDATE posts SET title = :title, content = :content, type = :type WHERE id = :id";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':title', $title);
+        $stmt->bindParam(':content', $content);
+        $stmt->bindParam(':type', $type);
+        
+        if ($stmt->execute()) {
+            header('Location: how-i-see-her.php?success=2');
+            exit();
+        }
+    } elseif ($action === 'delete_post') {
+        $id = (int)($_POST['id'] ?? 0);
+        
+        // Delete associated post_reads first
+        $query = "DELETE FROM post_reads WHERE post_id = :id";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        
+        // Delete the post
+        $query = "DELETE FROM posts WHERE id = :id";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':id', $id);
+        
+        if ($stmt->execute()) {
+            header('Location: how-i-see-her.php?success=3');
+            exit();
+        }
     }
 }
 ?>
@@ -70,10 +109,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
                 <p>Personal notes, love letters, and all the reasons why she's amazing</p>
             </div>
             
-            <?php if (isset($_GET['success']) && $_GET['success'] == '1'): ?>
+            <?php if (isset($_GET['success'])): ?>
                 <div class="alert alert-success">
                     <i class="fas fa-check-circle"></i>
-                    Note added successfully!
+                    <?php 
+                    if ($_GET['success'] == '1') {
+                        echo 'Note added successfully!';
+                    } elseif ($_GET['success'] == '2') {
+                        echo 'Note updated successfully!';
+                    } elseif ($_GET['success'] == '3') {
+                        echo 'Note deleted successfully!';
+                    }
+                    ?>
                 </div>
             <?php endif; ?>
             
@@ -226,6 +273,51 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         </div>
     </div>
     
+    <!-- Edit Post Modal (Admin Only) -->
+    <?php if ($is_admin): ?>
+    <div id="editPostModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Note</h3>
+                <span class="close" onclick="closeEditPost()">&times;</span>
+            </div>
+            <form method="POST" class="post-form" id="edit-post-form">
+                <input type="hidden" name="action" value="edit_post">
+                <input type="hidden" name="id" id="edit_post_id">
+                
+                <div class="form-group">
+                    <label for="edit_title">Title</label>
+                    <input type="text" id="edit_title" name="title" placeholder="Give your note a title..." required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit_type">Type</label>
+                    <select id="edit_type" name="type" required>
+                        <option value="note">Personal Note</option>
+                        <option value="love_letter">Love Letter</option>
+                        <option value="compliment">Compliment</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit_content">Content</label>
+                    <textarea id="edit_content" name="content" rows="6" placeholder="Write your thoughts here..." required></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        Save Changes
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditPost()">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <?php endif; ?>
+    
     <script src="https://unpkg.com/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script>
     <script src="assets/js/main.js"></script>
     <script>
@@ -311,17 +403,59 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
             <?php endif; ?>
         }
         
-        // Edit post (placeholder)
+        // Edit post
         function editPost(postId) {
-            alert('Edit functionality coming soon!');
+            const postCard = document.querySelector(`[data-id="${postId}"]`);
+            if (!postCard) return;
+            
+            const modal = document.getElementById('editPostModal');
+            if (!modal) return;
+            
+            // Populate form with existing data
+            document.getElementById('edit_post_id').value = postId;
+            document.getElementById('edit_title').value = postCard.dataset.title || '';
+            document.getElementById('edit_content').value = postCard.dataset.content || '';
+            document.getElementById('edit_type').value = postCard.dataset.type || 'note';
+            
+            // Show modal
+            modal.style.display = 'block';
         }
         
-        // Delete post (placeholder)
-        function deletePost(postId) {
-            if (confirm('Are you sure you want to delete this note?')) {
-                // Add delete functionality here
-                alert('Delete functionality coming soon!');
+        // Close edit post modal
+        function closeEditPost() {
+            const modal = document.getElementById('editPostModal');
+            if (modal) {
+                modal.style.display = 'none';
             }
+        }
+        
+        // Close modal when clicking outside
+        document.addEventListener('DOMContentLoaded', function() {
+            const editModal = document.getElementById('editPostModal');
+            if (editModal) {
+                editModal.addEventListener('click', function(e) {
+                    if (e.target === editModal) {
+                        closeEditPost();
+                    }
+                });
+            }
+        });
+        
+        // Delete post
+        function deletePost(postId) {
+            if (!confirm('Are you sure you want to delete this note? This action cannot be undone.')) {
+                return;
+            }
+            
+            // Create and submit form
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.innerHTML = `
+                <input type="hidden" name="action" value="delete_post">
+                <input type="hidden" name="id" value="${postId}">
+            `;
+            document.body.appendChild(form);
+            form.submit();
         }
         
         // Expand post functionality

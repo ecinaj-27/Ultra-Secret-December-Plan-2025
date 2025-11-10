@@ -20,6 +20,13 @@ if (is_logged_in()) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="landing-page">
+    <div id="slideshow-container">
+        <div class="slideshow-image image-1"></div>
+        <div class="slideshow-image image-2"></div>
+        <div class="slideshow-image image-3"></div>
+        <div class="slideshow-image image-4"></div>
+    </div>
+    <div class="landing-overlay"></div>
     <div class="landing-container">
         <div class="logo-container">
             <div class="logo">

@@ -1,6 +1,16 @@
 // Ultra Secret December Plan 2025 - Main JavaScript
 
+// Slideshow variables for landing page
+let currentSlide = 0;
+let slides = [];
+const SLIDE_INTERVAL = 8000; // 8 seconds per slide
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize slideshow for landing page
+    if (document.body.classList.contains('landing-page')) {
+        initSlideshow();
+    }
+    
     // Mobile navbar toggle
     const navbarToggle = document.getElementById('navbar-toggle');
     const navbarMenu = document.querySelector('.navbar-menu');
@@ -55,6 +65,57 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     });
 });
+
+// Initialize slideshow for landing page
+function initSlideshow() {
+    slides = document.querySelectorAll('.slideshow-image');
+    console.log('Initializing landing page slideshow, found slides:', slides.length);
+    
+    if (slides.length === 0) {
+        console.warn('No slideshow images found on landing page!');
+        return;
+    }
+    
+    // Ensure first slide is visible (it should be from CSS, but double-check)
+    if (slides[0]) {
+        slides[0].style.opacity = 1;
+        currentSlide = 0;
+        console.log('First slide displayed on landing page');
+    }
+    
+    // Hide all other slides
+    for (let i = 1; i < slides.length; i++) {
+        if (slides[i]) {
+            slides[i].style.opacity = 0;
+        }
+    }
+
+    // Only start cycling if there's more than one slide
+    if (slides.length > 1) {
+        console.log('Starting landing page slideshow interval, will change slides every', SLIDE_INTERVAL, 'ms');
+        setInterval(nextSlide, SLIDE_INTERVAL);
+    } else {
+        console.log('Only one slide on landing page, no cycling needed');
+    }
+}
+
+function nextSlide() {
+    if (slides.length === 0) return;
+    
+    // Hide current slide
+    if (slides[currentSlide]) {
+        slides[currentSlide].style.opacity = 0;
+    }
+
+    // Calculate the index of the next slide (loops back to 0)
+    currentSlide = (currentSlide + 1) % slides.length;
+
+    // Show the next slide (CSS handles the 2s fade transition)
+    if (slides[currentSlide]) {
+        slides[currentSlide].style.opacity = 1;
+        console.log('Landing page switched to slide:', currentSlide + 1);
+    }
+}
 
 // Live time update function
 function updateLiveTime() {

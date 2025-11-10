@@ -513,7 +513,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
             background: white;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 20px 60px rgba(12, 7, 7, 0.5);
         }
         
         .photo-lightbox-close {
@@ -553,18 +553,40 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
         .photo-lightbox-info {
             padding: 1.5rem;
             background: white;
+            max-height: 20vh;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
         
         .photo-lightbox-info div:first-child {
             font-size: 1.1rem;
             font-weight: 500;
-            color: #333;
+            color: #000;
             margin-bottom: 0.5rem;
+            word-wrap: break-word;
         }
-        
+    
         .photo-lightbox-info div:last-child {
             font-size: 0.9rem;
             color: #666;
+        }
+        
+        /* Custom scrollbar for lightbox info */
+        .photo-lightbox-info::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .photo-lightbox-info::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        .photo-lightbox-info::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        
+        .photo-lightbox-info::-webkit-scrollbar-thumb:hover {
+            background: #555;
         }
     </style>
 </body>

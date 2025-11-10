@@ -40,8 +40,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="passcode-body">
+<div id="slideshow-container">
+        <div class="slideshow-image image-1"></div>
+        <div class="slideshow-image image-2"></div>
+        <div class="slideshow-image image-3"></div>
+        <div class="slideshow-image image-4"></div>
+    </div>
     <div class="passcode-container">
-        <!-- Background blur effect -->
         <div class="background-blur"></div>
         
         <!-- Main content -->

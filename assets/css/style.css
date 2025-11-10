@@ -63,11 +63,55 @@ body {
 
 /* Landing Page Styles */
 .landing-page {
-    background: linear-gradient(135deg, #a0c4ff 0%, #bdb2ff 100%);
+    background: #000; /* Fallback color in case images don't load */
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Slideshow Styles for Landing Page */
+#slideshow-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2; /* Ensure it's behind everything */
+}
+
+.slideshow-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0; /* Hidden by default, JS will manage opacity */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: opacity 2s ease-in-out; /* Fade transition duration */
+}
+
+/* Image paths for landing page slideshow */
+#slideshow-container .image-1 { 
+    background-image: url('../slideshow-image/0a2b2004dd067af08fdfaec554268b34.jpg');
+    opacity: 1; /* Show first image by default */
+}
+#slideshow-container .image-2 { background-image: url('../slideshow-image/3cef6d1937a4be979b1de0cc21fc8645.jpg'); }
+#slideshow-container .image-3 { background-image: url('../slideshow-image/7ef662f109068f53caedbee3d9fb9ab6.jpg'); }
+#slideshow-container .image-4 { background-image: url('../slideshow-image/929bfb9d0b61899357d9c6ad54252afb.jpg'); }
+
+.landing-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4); /* Semi-transparent black overlay for better text contrast */
+    z-index: -1;
 }
 
 .landing-container {
@@ -75,6 +119,8 @@ body {
     color: white;
     max-width: 1200px;
     padding: 2rem;
+    position: relative;
+    z-index: 1;
 }
 
 .logo-container {

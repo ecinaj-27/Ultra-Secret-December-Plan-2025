@@ -4,11 +4,68 @@ let currentPasscode = '';
 let selectedUser = null;
 let users = [];
 
+// NEW GLOBAL VARIABLES FOR SLIDESHOW
+let currentSlide = 0;
+let slides = [];
+const SLIDE_INTERVAL = 8000; // 8 seconds per slide
+
 document.addEventListener('DOMContentLoaded', function() {
+    slides = document.querySelectorAll('.slideshow-image'); // Get slideshow images
     loadUsers();
     initializeKeypad();
     initializeEventListeners();
+    startSlideshow(); // Start the slideshow
 });
+
+// NEW SLIDESHOW FUNCTIONALITY
+function startSlideshow() {
+    console.log('Starting slideshow, found slides:', slides.length);
+    
+    if (slides.length === 0) {
+        console.warn('No slideshow images found!');
+        return;
+    }
+    
+    // Ensure first slide is visible (it should be from CSS, but double-check)
+    if (slides[0]) {
+        slides[0].style.opacity = 1;
+        currentSlide = 0;
+        console.log('First slide displayed');
+    }
+    
+    // Hide all other slides (CSS may have first slide visible, but we want to ensure only first is shown)
+    for (let i = 1; i < slides.length; i++) {
+        if (slides[i]) {
+            slides[i].style.opacity = 0;
+        }
+    }
+
+    // Only start cycling if there's more than one slide
+    if (slides.length > 1) {
+        console.log('Starting slideshow interval, will change slides every', SLIDE_INTERVAL, 'ms');
+        setInterval(nextSlide, SLIDE_INTERVAL);
+    } else {
+        console.log('Only one slide, no cycling needed');
+    }
+}
+
+function nextSlide() {
+    if (slides.length === 0) return;
+    
+    // Hide current slide
+    if (slides[currentSlide]) {
+        slides[currentSlide].style.opacity = 0;
+    }
+
+    // Calculate the index of the next slide (loops back to 0)
+    currentSlide = (currentSlide + 1) % slides.length;
+
+    // Show the next slide (CSS handles the 2s fade transition)
+    if (slides[currentSlide]) {
+        slides[currentSlide].style.opacity = 1;
+        console.log('Switched to slide:', currentSlide + 1);
+    }
+}
 
 // Load users from database
 async function loadUsers() {
