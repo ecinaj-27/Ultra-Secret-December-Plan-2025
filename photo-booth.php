@@ -552,23 +552,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
         
         .photo-lightbox-info {
             padding: 1.5rem;
-            background: white;
+            background: white !important;
             max-height: 20vh;
             overflow-y: auto;
             overflow-x: hidden;
+            color: #000 !important;
         }
         
         .photo-lightbox-info div:first-child {
             font-size: 1.1rem;
             font-weight: 500;
-            color: #000;
+            color: #000 !important;
             margin-bottom: 0.5rem;
             word-wrap: break-word;
         }
     
         .photo-lightbox-info div:last-child {
             font-size: 0.9rem;
-            color: #666;
+            color: #666 !important;
+        }
+        
+        #lightbox-caption {
+            color: #000 !important;
+        }
+        
+        #lightbox-date {
+            color: #666 !important;
         }
         
         /* Custom scrollbar for lightbox info */

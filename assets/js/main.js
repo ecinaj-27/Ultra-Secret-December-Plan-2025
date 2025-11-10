@@ -64,7 +64,41 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 300);
         }, 5000);
     });
+    
+    // Dark mode toggle
+    initDarkMode();
 });
+
+// Dark Mode Functionality
+function initDarkMode() {
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    if (!darkModeToggle) return;
+    
+    // Check saved preference
+    const isDarkMode = localStorage.getItem('darkMode') === 'true';
+    if (isDarkMode) {
+        document.body.classList.add('dark-mode');
+        updateDarkModeIcon(true);
+    }
+    
+    // Toggle dark mode
+    darkModeToggle.addEventListener('click', function() {
+        const isDark = document.body.classList.toggle('dark-mode');
+        localStorage.setItem('darkMode', isDark);
+        updateDarkModeIcon(isDark);
+    });
+}
+
+function updateDarkModeIcon(isDark) {
+    const icon = document.getElementById('dark-mode-icon');
+    const text = document.getElementById('dark-mode-text');
+    if (icon) {
+        icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+    }
+    if (text) {
+        text.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+    }
+}
 
 // Initialize slideshow for landing page
 function initSlideshow() {
@@ -120,6 +154,8 @@ function nextSlide() {
 // Live time update function
 function updateLiveTime() {
     const timeElement = document.getElementById('live-time');
+    const dateElement = document.querySelector('.current-date');
+    
     if (timeElement) {
         const now = new Date();
         const timeString = now.toLocaleTimeString('en-US', {
@@ -129,6 +165,17 @@ function updateLiveTime() {
             second: '2-digit'
         });
         timeElement.textContent = timeString;
+    }
+    
+    // Update date if element exists
+    if (dateElement) {
+        const now = new Date();
+        const dateString = now.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        dateElement.textContent = dateString;
     }
 }
 
@@ -523,7 +570,7 @@ style.textContent = `
     }
     
     .calendar-day.today {
-        background: #ff6b6b;
+        background: #4CAF50;
         color: white;
         font-weight: 600;
     }
@@ -551,7 +598,7 @@ style.textContent = `
     }
     
     .calendar-nav-btn {
-        background: #ff6b6b;
+        background: #4CAF50;
         color: white;
         border: none;
         padding: 0.5rem;
@@ -566,11 +613,11 @@ style.textContent = `
     }
     
     .calendar-nav-btn:hover {
-        background: #ff5252;
+        background: #45a049;
     }
     
     .calendar-expand-btn {
-        background: #ff6b6b;
+        background: #4CAF50;
         color: white;
         border: none;
         padding: 0.5rem;
@@ -585,7 +632,7 @@ style.textContent = `
     }
     
     .calendar-expand-btn:hover {
-        background: #ff5252;
+        background: #45a049;
     }
     
     .calendar-expanded {
@@ -612,13 +659,13 @@ style.textContent = `
         padding: 1rem;
         margin-bottom: 0.5rem;
         border-radius: 6px;
-        border-left: 4px solid #ff6b6b;
+        border-left: 4px solid #4CAF50;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     
     .calendar-todo-item.completed {
         opacity: 0.6;
-        border-left-color: #4caf50;
+        border-left-color: #4CAF50;
     }
     
     .calendar-todo-item h6 {
@@ -634,7 +681,7 @@ style.textContent = `
     }
     
     .calendar-todo-item .todo-category {
-        background: #ff6b6b;
+        background: #4CAF50;
         color: white;
         padding: 0.25rem 0.5rem;
         border-radius: 12px;

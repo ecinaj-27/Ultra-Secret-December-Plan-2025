@@ -54,26 +54,11 @@ $stmt->bindParam(':user_id', $_SESSION['user_id']);
 $stmt->execute();
 $flashcards = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Get timeline events and locations for admin
+// Get timeline events and locations for admin (will be re-fetched after form submissions)
 $timeline_events = [];
 $locations = [];
 $custom_compliments = [];
 $custom_inspirations = [];
-if ($is_admin) {
-    $query = "SELECT * FROM timeline_events ORDER BY event_date ASC";
-    $stmt = $db->prepare($query);
-    $stmt->execute();
-    $timeline_events = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    $query = "SELECT * FROM locations ORDER BY visit_date DESC";
-    $stmt = $db->prepare($query);
-    $stmt->execute();
-    $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    // Get custom content
-    $custom_compliments = get_all_compliments();
-    $custom_inspirations = get_all_inspirations();
-}
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -147,6 +132,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $stmt->bindParam(':caption', $caption);
                 $stmt->bindParam(':image_path', $image_path);
                 $stmt->execute();
+                
+                header('Location: tools.php?success=timeline_added');
+                exit();
             }
             break;
             
@@ -182,6 +170,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $stmt->bindParam(':image_path', $image_path);
                 $stmt->bindParam(':id', $id);
                 $stmt->execute();
+                
+                header('Location: tools.php?success=timeline_updated');
+                exit();
             }
             break;
         
@@ -198,6 +189,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $stmt = $db->prepare("DELETE FROM timeline_events WHERE id = :id");
                 $stmt->bindParam(':id', $id);
                 $stmt->execute();
+                
+                header('Location: tools.php?success=timeline_deleted');
+                exit();
             }
             break;
             
@@ -483,6 +477,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     header('Location: tools.php');
     exit();
+}
+
+// Fetch timeline events and locations for admin (after form submissions)
+if ($is_admin) {
+    $query = "SELECT * FROM timeline_events ORDER BY event_date ASC";
+    $stmt = $db->prepare($query);
+    $stmt->execute();
+    $timeline_events = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    $query = "SELECT * FROM locations ORDER BY visit_date DESC";
+    $stmt = $db->prepare($query);
+    $stmt->execute();
+    $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Get custom content
+    $custom_compliments = get_all_compliments();
+    $custom_inspirations = get_all_inspirations();
 }
 ?>
 <!DOCTYPE html>

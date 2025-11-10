@@ -19,7 +19,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
         $description = sanitize_input($_POST['description']);
         $rating = (int)$_POST['rating'];
         $external_link = sanitize_input($_POST['external_link']);
+        // Don't sanitize spotify_embed - it contains HTML/iframe code
         $spotify_embed = $_POST['spotify_embed'] ?? '';
+        $spotify_embed = trim($spotify_embed);
         
         // Handle image upload (not required for songs)
         $image_path = null;
@@ -27,15 +29,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
             $image_path = upload_file($_FILES['image'], 'uploads/media/');
         }
         
-        $query = "INSERT INTO media_items (title, type, description, rating, external_link, spotify_embed, image_path) VALUES (:title, :type, :description, :rating, :external_link, :spotify_embed, :image_path)";
-        $stmt = $db->prepare($query);
-        $stmt->bindParam(':title', $title);
-        $stmt->bindParam(':type', $type);
-        $stmt->bindParam(':description', $description);
-        $stmt->bindParam(':rating', $rating);
-        $stmt->bindParam(':external_link', $external_link);
-        $stmt->bindParam(':spotify_embed', $spotify_embed);
-        $stmt->bindParam(':image_path', $image_path);
+        // Check if spotify_embed column exists
+        $has_spotify_column = false;
+        try {
+            $check_query = "SHOW COLUMNS FROM media_items LIKE 'spotify_embed'";
+            $check_stmt = $db->prepare($check_query);
+            $check_stmt->execute();
+            $has_spotify_column = $check_stmt->rowCount() > 0;
+        } catch (Exception $e) {
+            $has_spotify_column = false;
+        }
+        
+        if ($has_spotify_column) {
+            $query = "INSERT INTO media_items (title, type, description, rating, external_link, spotify_embed, image_path) VALUES (:title, :type, :description, :rating, :external_link, :spotify_embed, :image_path)";
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':title', $title);
+            $stmt->bindParam(':type', $type);
+            $stmt->bindParam(':description', $description);
+            $stmt->bindParam(':rating', $rating);
+            $stmt->bindParam(':external_link', $external_link);
+            $stmt->bindParam(':spotify_embed', $spotify_embed);
+            $stmt->bindParam(':image_path', $image_path);
+        } else {
+            $query = "INSERT INTO media_items (title, type, description, rating, external_link, image_path) VALUES (:title, :type, :description, :rating, :external_link, :image_path)";
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':title', $title);
+            $stmt->bindParam(':type', $type);
+            $stmt->bindParam(':description', $description);
+            $stmt->bindParam(':rating', $rating);
+            $stmt->bindParam(':external_link', $external_link);
+            $stmt->bindParam(':image_path', $image_path);
+        }
         $stmt->execute();
         
         header('Location: media.php?success=1');
@@ -49,7 +73,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
         $description = sanitize_input($_POST['description']);
         $rating = (int)$_POST['rating'];
         $external_link = sanitize_input($_POST['external_link']);
+        // Don't sanitize spotify_embed - it contains HTML/iframe code
         $spotify_embed = $_POST['spotify_embed'] ?? '';
+        $spotify_embed = trim($spotify_embed);
         
         // Fetch existing image
         $stmt = $db->prepare("SELECT image_path FROM media_items WHERE id = :id");
@@ -70,16 +96,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
             $image_path = null; // songs don't use images
         }
         
-        $query = "UPDATE media_items SET title = :title, type = :type, description = :description, rating = :rating, external_link = :external_link, spotify_embed = :spotify_embed, image_path = :image_path WHERE id = :id";
-        $stmt = $db->prepare($query);
-        $stmt->bindParam(':title', $title);
-        $stmt->bindParam(':type', $type);
-        $stmt->bindParam(':description', $description);
-        $stmt->bindParam(':rating', $rating);
-        $stmt->bindParam(':external_link', $external_link);
-        $stmt->bindParam(':spotify_embed', $spotify_embed);
-        $stmt->bindParam(':image_path', $image_path);
-        $stmt->bindParam(':id', $id);
+        // Check if spotify_embed column exists
+        $has_spotify_column = false;
+        try {
+            $check_query = "SHOW COLUMNS FROM media_items LIKE 'spotify_embed'";
+            $check_stmt = $db->prepare($check_query);
+            $check_stmt->execute();
+            $has_spotify_column = $check_stmt->rowCount() > 0;
+        } catch (Exception $e) {
+            $has_spotify_column = false;
+        }
+        
+        if ($has_spotify_column) {
+            $query = "UPDATE media_items SET title = :title, type = :type, description = :description, rating = :rating, external_link = :external_link, spotify_embed = :spotify_embed, image_path = :image_path WHERE id = :id";
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':title', $title);
+            $stmt->bindParam(':type', $type);
+            $stmt->bindParam(':description', $description);
+            $stmt->bindParam(':rating', $rating);
+            $stmt->bindParam(':external_link', $external_link);
+            $stmt->bindParam(':spotify_embed', $spotify_embed);
+            $stmt->bindParam(':image_path', $image_path);
+            $stmt->bindParam(':id', $id);
+        } else {
+            $query = "UPDATE media_items SET title = :title, type = :type, description = :description, rating = :rating, external_link = :external_link, image_path = :image_path WHERE id = :id";
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':title', $title);
+            $stmt->bindParam(':type', $type);
+            $stmt->bindParam(':description', $description);
+            $stmt->bindParam(':rating', $rating);
+            $stmt->bindParam(':external_link', $external_link);
+            $stmt->bindParam(':image_path', $image_path);
+            $stmt->bindParam(':id', $id);
+        }
         $stmt->execute();
         
         header('Location: media.php?updated=1');
@@ -101,6 +150,76 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
         header('Location: media.php?deleted=1');
         exit();
     }
+    
+    if ($action === 'update_playlist') {
+        $playlist_title = sanitize_input($_POST['playlist_title'] ?? 'Our Love Songs');
+        $playlist_description = sanitize_input($_POST['playlist_description'] ?? 'Songs that remind us of each other');
+        $playlist_link = sanitize_input($_POST['playlist_link'] ?? '');
+        
+        // Handle playlist image upload
+        $playlist_image = null;
+        if (isset($_FILES['playlist_image']) && $_FILES['playlist_image']['error'] == 0) {
+            $playlist_image = upload_file($_FILES['playlist_image'], 'uploads/media/');
+        }
+        
+        // Store playlist data in site_content table
+        // Store link in content field as JSON or separated format
+        $playlist_data = json_encode([
+            'title' => $playlist_title,
+            'description' => $playlist_description,
+            'link' => $playlist_link,
+            'image' => $playlist_image
+        ]);
+        
+        $query = "INSERT INTO site_content (content_key, title, content, updated_by) 
+                  VALUES ('playlist', :title, :content, :user_id)
+                  ON DUPLICATE KEY UPDATE 
+                  title = VALUES(title), 
+                  content = VALUES(content),
+                  updated_by = VALUES(updated_by)";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':title', $playlist_title);
+        $stmt->bindParam(':content', $playlist_data);
+        $stmt->bindParam(':user_id', $_SESSION['user_id']);
+        $stmt->execute();
+        
+        header('Location: media.php?playlist_updated=1');
+        exit();
+    }
+}
+
+// Get playlist data
+$playlist_data = null;
+$playlist_query = "SELECT * FROM site_content WHERE content_key = 'playlist'";
+$playlist_stmt = $db->prepare($playlist_query);
+$playlist_stmt->execute();
+$playlist_result = $playlist_stmt->fetch(PDO::FETCH_ASSOC);
+if ($playlist_result && !empty($playlist_result['content'])) {
+    $playlist_data = json_decode($playlist_result['content'], true);
+    if (!$playlist_data) {
+        // Fallback if not JSON
+        $playlist_data = [
+            'title' => $playlist_result['title'] ?? 'Our Love Songs',
+            'description' => $playlist_result['content'] ?? 'Songs that remind us of each other',
+            'link' => '',
+            'image' => null
+        ];
+    }
+}
+
+// Get media items - ensure spotify_embed column is included
+// First check if column exists, if not, add it
+try {
+    $check_col = "SHOW COLUMNS FROM media_items LIKE 'spotify_embed'";
+    $check_stmt = $db->prepare($check_col);
+    $check_stmt->execute();
+    if ($check_stmt->rowCount() == 0) {
+        // Column doesn't exist, add it
+        $alter_query = "ALTER TABLE media_items ADD COLUMN spotify_embed TEXT AFTER external_link";
+        $db->exec($alter_query);
+    }
+} catch (Exception $e) {
+    // Column might already exist or table doesn't exist
 }
 
 // Get media items
@@ -139,6 +258,34 @@ $series = array_filter($media_items, function($item) { return $item['type'] === 
                     </button>
                 <?php endif; ?>
             </div>
+            
+            <?php if (isset($_GET['playlist_updated'])): ?>
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    Playlist updated successfully!
+                </div>
+            <?php endif; ?>
+            
+            <?php if (isset($_GET['success'])): ?>
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    Media added successfully!
+                </div>
+            <?php endif; ?>
+            
+            <?php if (isset($_GET['updated'])): ?>
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    Media updated successfully!
+                </div>
+            <?php endif; ?>
+            
+            <?php if (isset($_GET['deleted'])): ?>
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    Media deleted successfully!
+                </div>
+            <?php endif; ?>
             
             <?php if ($is_admin): ?>
             <!-- Admin Upload Form -->
@@ -189,10 +336,10 @@ $series = array_filter($media_items, function($item) { return $item['type'] === 
                         <div class="form-group" id="spotify-embed-group" style="display: none;">
                             <label for="spotify_embed">Spotify Embed Code</label>
                             <textarea id="spotify_embed" name="spotify_embed" rows="4" 
-                                placeholder="Paste the Spotify embed code here..."></textarea>
+                                placeholder='Paste the full iframe code here, e.g.: &lt;iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/track/..." width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"&gt;&lt;/iframe&gt;'></textarea>
                             <small class="form-help">
                                 <i class="fas fa-info-circle"></i>
-                                To get the embed code: Go to Spotify → Right-click on song → Share → Embed → Copy the code
+                                To get the embed code: Go to Spotify → Right-click on song → Share → Embed → Copy the full iframe code
                             </small>
                         </div>
                         
@@ -348,14 +495,14 @@ $series = array_filter($media_items, function($item) { return $item['type'] === 
                 <!-- Embedded Playlist Card -->
                 <div class="playlist-card">
                     <div class="playlist-image">
-                        <img id="playlist-cover" src="assets/images/playlist-default.jpg" alt="Our Playlist" onclick="openPlaylist()">
+                        <img id="playlist-cover" src="<?php echo !empty($playlist_data['image']) ? htmlspecialchars($playlist_data['image']) : 'assets/images/playlist-default.jpg'; ?>" alt="Our Playlist" onclick="openPlaylist()">
                         <div class="playlist-overlay">
                             <i class="fas fa-play"></i>
                         </div>
                     </div>
                     <div class="playlist-info">
-                        <h3 id="playlist-title">Our Love Songs</h3>
-                        <p id="playlist-description">Songs that remind us of each other</p>
+                        <h3 id="playlist-title"><?php echo htmlspecialchars($playlist_data['title'] ?? 'Our Love Songs'); ?></h3>
+                        <p id="playlist-description"><?php echo htmlspecialchars($playlist_data['description'] ?? 'Songs that remind us of each other'); ?></p>
                         <button class="playlist-btn" onclick="openPlaylist()">
                             <i class="fas fa-external-link-alt"></i>
                             Open Playlist
@@ -370,15 +517,15 @@ $series = array_filter($media_items, function($item) { return $item['type'] === 
                         <input type="hidden" name="action" value="update_playlist">
                         <div class="form-group">
                             <label for="playlist_title">Playlist Title</label>
-                            <input type="text" id="playlist_title" name="playlist_title" value="Our Love Songs">
+                            <input type="text" id="playlist_title" name="playlist_title" value="<?php echo htmlspecialchars($playlist_data['title'] ?? 'Our Love Songs'); ?>">
                         </div>
                         <div class="form-group">
                             <label for="playlist_description">Description</label>
-                            <textarea id="playlist_description" name="playlist_description">Songs that remind us of each other</textarea>
+                            <textarea id="playlist_description" name="playlist_description"><?php echo htmlspecialchars($playlist_data['description'] ?? 'Songs that remind us of each other'); ?></textarea>
                         </div>
                         <div class="form-group">
                             <label for="playlist_link">Playlist Link</label>
-                            <input type="url" id="playlist_link" name="playlist_link" placeholder="https://open.spotify.com/playlist/...">
+                            <input type="url" id="playlist_link" name="playlist_link" value="<?php echo htmlspecialchars($playlist_data['link'] ?? ''); ?>" placeholder="https://open.spotify.com/playlist/...">
                         </div>
                         <div class="form-group">
                             <label for="playlist_image">Cover Image</label>
@@ -423,9 +570,49 @@ $series = array_filter($media_items, function($item) { return $item['type'] === 
                                         <p class="track-description"><?php echo htmlspecialchars($song['description']); ?></p>
                                     <?php endif; ?>
                                     
-                                    <?php if ($song['spotify_embed']): ?>
+                                    <?php 
+                                    // Get spotify_embed from database - check all possible keys
+                                    $embed_code = '';
+                                    if (isset($song['spotify_embed']) && $song['spotify_embed'] !== null && $song['spotify_embed'] !== '') {
+                                        $embed_code = $song['spotify_embed'];
+                                    }
+                                    
+                                    // Clean and prepare embed code
+                                    $embed_code = trim($embed_code);
+                                    
+                                    if (!empty($embed_code)): ?>
                                         <div class="spotify-embed">
-                                            <?php echo $song['spotify_embed']; ?>
+                                            <?php 
+                                            // Decode any HTML entities that might have been encoded
+                                            $embed_code = html_entity_decode($embed_code, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                                            
+                                            // Strip any slashes that might have been added
+                                            $embed_code = stripslashes($embed_code);
+                                            
+                                            // Check if it's already a complete iframe
+                                            if (stripos($embed_code, '<iframe') !== false) {
+                                                // It's already a full iframe code - output directly without any escaping
+                                                echo $embed_code;
+                                            } else if (stripos($embed_code, 'spotify.com') !== false || stripos($embed_code, 'open.spotify.com') !== false) {
+                                                // It's a Spotify URL - extract track/album/playlist ID
+                                                if (preg_match('/spotify\.com\/(track|album|playlist)\/([a-zA-Z0-9]+)/', $embed_code, $matches)) {
+                                                    $type = $matches[1];
+                                                    $id = $matches[2];
+                                                    // Extract query params if present
+                                                    $query_params = '';
+                                                    if (preg_match('/\?([^"]+)/', $embed_code, $qmatches)) {
+                                                        $query_params = '?' . $qmatches[1];
+                                                    }
+                                                    echo '<iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/' . $type . '/' . $id . $query_params . '" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>';
+                                                } else {
+                                                    // Use as direct URL
+                                                    echo '<iframe data-testid="embed-iframe" style="border-radius:12px" src="' . htmlspecialchars($embed_code, ENT_QUOTES, 'UTF-8') . '" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>';
+                                                }
+                                            } else {
+                                                // Unknown format - try to create iframe anyway
+                                                echo '<iframe data-testid="embed-iframe" style="border-radius:12px" src="' . htmlspecialchars($embed_code, ENT_QUOTES, 'UTF-8') . '" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>';
+                                            }
+                                            ?>
                                         </div>
                                     <?php else: ?>
                                         <div class="no-embed">
@@ -442,7 +629,7 @@ $series = array_filter($media_items, function($item) { return $item['type'] === 
                                     <?php endif; ?>
                                     <?php if ($is_admin): ?>
                                     <div class="admin-actions">
-                                        <button class="btn-icon" onclick="openEditMedia(<?php echo $song['id']; ?>, '<?php echo htmlspecialchars($song['title'], ENT_QUOTES); ?>', 'song', '<?php echo htmlspecialchars($song['description'], ENT_QUOTES); ?>', <?php echo (int)$song['rating']; ?>, '<?php echo htmlspecialchars($song['external_link'], ENT_QUOTES); ?>', `<?php echo str_replace('`', '\`', $song['spotify_embed']); ?>`)"><i class="fas fa-edit"></i></button>
+                                        <button class="btn-icon" onclick="openEditMedia(<?php echo $song['id']; ?>, '<?php echo htmlspecialchars($song['title'], ENT_QUOTES); ?>', 'song', '<?php echo htmlspecialchars($song['description'], ENT_QUOTES); ?>', <?php echo (int)$song['rating']; ?>, '<?php echo htmlspecialchars($song['external_link'], ENT_QUOTES); ?>', `<?php echo str_replace('`', '\`', $song['spotify_embed'] ?? ''); ?>`)"><i class="fas fa-edit"></i></button>
                                         <button class="btn-icon" onclick="deleteMedia(<?php echo $song['id']; ?>)"><i class="fas fa-trash"></i></button>
                                     </div>
                                     <?php endif; ?>
@@ -584,8 +771,8 @@ $series = array_filter($media_items, function($item) { return $item['type'] === 
         
         // Open playlist
         function openPlaylist() {
-            const playlistLink = document.getElementById('playlist-link')?.value || '#';
-            if (playlistLink && playlistLink !== '#') {
+            const playlistLink = document.getElementById('playlist_link')?.value || '<?php echo htmlspecialchars($playlist_data['link'] ?? '', ENT_QUOTES); ?>';
+            if (playlistLink && playlistLink !== '') {
                 window.open(playlistLink, '_blank');
             } else {
                 alert('Playlist link not set. Admin can add a link in the edit form.');

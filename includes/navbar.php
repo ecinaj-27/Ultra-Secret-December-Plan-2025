@@ -120,7 +120,7 @@ try {
             <li class="nav-item">
                 <a href="medbio.php" class="nav-link">
                     <i class="fas fa-graduation-cap"></i>
-                    <span>For My MedBio Bebe</span>
+                    <span> Everything MedBio</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -137,6 +137,14 @@ try {
             </li>
         </ul>
     </div>
+    <!-- Dark Mode Toggle -->
+    <div class="sidebar-footer" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
+        <button class="nav-link" id="dark-mode-toggle" style="background: none; border: none; width: 100%; text-align: left; cursor: pointer; color: inherit;">
+            <i class="fas fa-moon" id="dark-mode-icon"></i>
+            <span id="dark-mode-text">Dark Mode</span>
+        </button>
+    </div>
+    
     <!-- Logout pinned at bottom -->
     <div class="sidebar-footer">
         <a href="logout.php" class="nav-link">

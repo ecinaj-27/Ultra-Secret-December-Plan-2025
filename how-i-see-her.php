@@ -228,8 +228,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
                                         <span class="post-date"><?php echo time_ago($post['created_at']); ?></span>
                                     </div>
                                 </div>
-                                <div class="post-content">
-                                    <p><?php echo nl2br(htmlspecialchars($post['content'])); ?></p>
+                                <div class="post-content" id="post-content-<?php echo $post['id']; ?>">
+                                    <p><?php echo nl2br(htmlspecialchars($post['content'], ENT_QUOTES, 'UTF-8')); ?></p>
                                 </div>
                                 <div class="post-expand">
                                     <button class="btn btn-secondary btn-sm" onclick="expandPost(<?php echo $post['id']; ?>)">
@@ -458,7 +458,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
             form.submit();
         }
         
-        // Expand post functionality
+        // Expand post functionality (opens lightbox popup)
         async function expandPost(postId) {
             const postCard = document.querySelector(`[data-id="${postId}"]`);
             const lightbox = document.getElementById('post-lightbox');

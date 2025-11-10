@@ -166,20 +166,37 @@ $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 
                 <div class="timeline-container">
-                    <div class="timeline-line"></div>
-                    <div class="timeline-dots">
-                        <?php foreach ($timeline_events as $index => $event): ?>
-                            <div class="timeline-dot" 
-                                 data-date="<?php echo format_date($event['event_date']); ?>"
-                                 data-title="<?php echo htmlspecialchars($event['title']); ?>"
-                                 data-description="<?php echo htmlspecialchars($event['description'] ?? ''); ?>"
-                                 data-caption="<?php echo htmlspecialchars($event['caption'] ?? ''); ?>"
-                                 data-image="<?php echo htmlspecialchars($event['image_path'] ?? ''); ?>"
-                                 style="left: <?php echo ($index / (count($timeline_events) - 1)) * 100; ?>%">
-                                <div class="dot-inner"></div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
+                    <?php if (empty($timeline_events)): ?>
+                        <div class="empty-state" style="text-align: center; padding: 2rem; color: #666;">
+                            <i class="fas fa-heart" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                            <p>No timeline events yet. Add events in the Tools page!</p>
+                        </div>
+                    <?php else: ?>
+                        <div class="timeline-line"></div>
+                        <div class="timeline-dots">
+                            <?php 
+                            $event_count = count($timeline_events);
+                            foreach ($timeline_events as $index => $event): 
+                                // Fix division by zero when there's only 1 event
+                                $position = $event_count > 1 ? ($index / ($event_count - 1)) * 100 : 50;
+                            ?>
+                                <div class="timeline-dot" 
+                                     data-date="<?php echo format_date($event['event_date']); ?>"
+                                     data-title="<?php echo htmlspecialchars($event['title']); ?>"
+                                     data-description="<?php echo htmlspecialchars($event['description'] ?? ''); ?>"
+                                     data-caption="<?php echo htmlspecialchars($event['caption'] ?? ''); ?>"
+                                     data-image="<?php echo htmlspecialchars($event['image_path'] ?? ''); ?>"
+                                     style="left: <?php echo $position; ?>%"
+                                     title="<?php echo htmlspecialchars($event['title']); ?> - <?php echo format_date($event['event_date']); ?>">
+                                    <div class="dot-inner"></div>
+                                    <span class="timeline-dot-label"><?php echo htmlspecialchars($event['title']); ?></span>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                        <div style="text-align: center; margin-top: 1rem; color: #666; font-size: 0.9rem;">
+                            <i class="fas fa-info-circle"></i> Hover over the dots to see event titles. Click to view details.
+                        </div>
+                    <?php endif; ?>
                 </div>
             </section>
             

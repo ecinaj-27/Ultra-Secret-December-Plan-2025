@@ -11,38 +11,33 @@ $db = $database->getConnection();
 // Check if user is admin
 $is_admin = is_admin();
 
-// Get study entries
-$query = "SELECT * FROM study_entries WHERE user_id = :user_id ORDER BY entry_date DESC LIMIT 10";
+// Get study entries (shared - all users can see all entries)
+$query = "SELECT se.*, u.name as user_name FROM study_entries se JOIN users u ON se.user_id = u.id ORDER BY se.entry_date DESC LIMIT 10";
 $stmt = $db->prepare($query);
-$stmt->bindParam(':user_id', $_SESSION['user_id']);
 $stmt->execute();
 $study_entries = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Get flashcards
-$query = "SELECT * FROM flashcards WHERE user_id = :user_id ORDER BY created_at DESC";
+// Get flashcards (shared - all users can see all flashcards)
+$query = "SELECT f.*, u.name as user_name FROM flashcards f JOIN users u ON f.user_id = u.id ORDER BY f.created_at DESC";
 $stmt = $db->prepare($query);
-$stmt->bindParam(':user_id', $_SESSION['user_id']);
 $stmt->execute();
 $flashcards = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Get lab entries
-$query = "SELECT * FROM lab_entries WHERE user_id = :user_id ORDER BY entry_date DESC";
+// Get lab entries (shared - all users can see all lab entries)
+$query = "SELECT le.*, u.name as user_name FROM lab_entries le JOIN users u ON le.user_id = u.id ORDER BY le.entry_date DESC";
 $stmt = $db->prepare($query);
-$stmt->bindParam(':user_id', $_SESSION['user_id']);
 $stmt->execute();
 $lab_entries = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Get resources
-$query = "SELECT * FROM resources WHERE user_id = :user_id ORDER BY uploaded_at DESC";
+// Get resources (shared - all users can see all resources)
+$query = "SELECT r.*, u.name as user_name FROM resources r JOIN users u ON r.user_id = u.id ORDER BY r.uploaded_at DESC";
 $stmt = $db->prepare($query);
-$stmt->bindParam(':user_id', $_SESSION['user_id']);
 $stmt->execute();
 $resources = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Get user's to-do items
-$query = "SELECT * FROM todo_items WHERE user_id = :user_id ORDER BY position_order ASC, created_at DESC";
+// Get to-do items (shared - all users can see all todos)
+$query = "SELECT t.*, u.name as user_name FROM todo_items t JOIN users u ON t.user_id = u.id ORDER BY t.position_order ASC, t.created_at DESC";
 $stmt = $db->prepare($query);
-$stmt->bindParam(':user_id', $_SESSION['user_id']);
 $stmt->execute();
 $todo_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -90,10 +85,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $category = sanitize_input($_POST['category']);
             $difficulty = sanitize_input($_POST['difficulty']);
             
-            $query = "UPDATE flashcards SET front_text = :front_text, back_text = :back_text, category = :category, difficulty = :difficulty WHERE id = :id AND user_id = :user_id";
+            // All users can edit any flashcard (shared access)
+            $query = "UPDATE flashcards SET front_text = :front_text, back_text = :back_text, category = :category, difficulty = :difficulty WHERE id = :id";
             $stmt = $db->prepare($query);
             $stmt->bindParam(':id', $id);
-            $stmt->bindParam(':user_id', $_SESSION['user_id']);
             $stmt->bindParam(':front_text', $front_text);
             $stmt->bindParam(':back_text', $back_text);
             $stmt->bindParam(':category', $category);
@@ -103,10 +98,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             
         case 'delete_flashcard':
             $id = $_POST['id'];
-            $query = "DELETE FROM flashcards WHERE id = :id AND user_id = :user_id";
+            // All users can delete any flashcard (shared access)
+            $query = "DELETE FROM flashcards WHERE id = :id";
             $stmt = $db->prepare($query);
             $stmt->bindParam(':id', $id);
-            $stmt->bindParam(':user_id', $_SESSION['user_id']);
             $stmt->execute();
             break;
             
@@ -144,19 +139,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             
         case 'toggle_todo':
             $todo_id = $_POST['todo_id'];
-            $query = "UPDATE todo_items SET is_completed = NOT is_completed WHERE id = :todo_id AND user_id = :user_id";
+            // All users can toggle any todo (shared access)
+            $query = "UPDATE todo_items SET is_completed = NOT is_completed WHERE id = :todo_id";
             $stmt = $db->prepare($query);
             $stmt->bindParam(':todo_id', $todo_id);
-            $stmt->bindParam(':user_id', $_SESSION['user_id']);
             $stmt->execute();
             break;
             
         case 'delete_todo':
             $todo_id = $_POST['todo_id'];
-            $query = "DELETE FROM todo_items WHERE id = :todo_id AND user_id = :user_id";
+            // All users can delete any todo (shared access)
+            $query = "DELETE FROM todo_items WHERE id = :todo_id";
             $stmt = $db->prepare($query);
             $stmt->bindParam(':todo_id', $todo_id);
-            $stmt->bindParam(':user_id', $_SESSION['user_id']);
             $stmt->execute();
             break;
             
@@ -201,11 +196,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         case 'delete_resource':
             $resource_id = $_POST['resource_id'];
             
-            // First get the file path to delete the physical file
-            $query = "SELECT file_path FROM resources WHERE id = :id AND user_id = :user_id";
+            // First get the file path to delete the physical file (all users can delete any resource)
+            $query = "SELECT file_path FROM resources WHERE id = :id";
             $stmt = $db->prepare($query);
             $stmt->bindParam(':id', $resource_id);
-            $stmt->bindParam(':user_id', $_SESSION['user_id']);
             $stmt->execute();
             $resource = $stmt->fetch(PDO::FETCH_ASSOC);
             
@@ -213,11 +207,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 unlink($resource['file_path']);
             }
             
-            // Delete from database
-            $query = "DELETE FROM resources WHERE id = :id AND user_id = :user_id";
+            // Delete from database (all users can delete any resource - shared access)
+            $query = "DELETE FROM resources WHERE id = :id";
             $stmt = $db->prepare($query);
             $stmt->bindParam(':id', $resource_id);
-            $stmt->bindParam(':user_id', $_SESSION['user_id']);
+            $stmt->execute();
+            break;
+            
+        case 'delete_study_entry':
+            $id = $_POST['id'];
+            // All users can delete any study entry (shared access)
+            $query = "DELETE FROM study_entries WHERE id = :id";
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+            break;
+            
+        case 'delete_lab_entry':
+            $id = $_POST['id'];
+            // All users can delete any lab entry (shared access)
+            $query = "DELETE FROM lab_entries WHERE id = :id";
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':id', $id);
             $stmt->execute();
             break;
     }
@@ -231,7 +242,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>For My MedBio Bebe - Our Secret Place</title>
+    <title>Everything Medbio - Our Secret Place</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -242,33 +253,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <main class="main-content">
         <div class="medbio-container">
             <div class="page-header">
-                <h1><i class="fas fa-graduation-cap"></i> For My MedBio Bebe</h1>
+                <h1>Everything MedBio</h1>
                 <p>Your comprehensive medical study companion</p>
             </div>
             <section class="tool-launcher">
                 <div class="info-grid">
                     <div class="info-card launcher" onclick="openModal('todoModal')">
-                        <i class="fas fa-tasks"></i>
                         <h3>Study To-Do List</h3>
                         <p>Add a study task</p>
                     </div>
                     <div class="info-card launcher" onclick="openModal('studyModal')">
-                        <i class="fas fa-chart-line"></i>
                         <h3>Study Tracker</h3>
                         <p>Log study hours</p>
                     </div>
                     <div class="info-card launcher" onclick="openModal('flashcardModal')">
-                        <i class="fas fa-cards-blank"></i>
                         <h3>Flashcard Generator</h3>
                         <p>Create a flashcard</p>
                     </div>
                     <div class="info-card launcher" onclick="openModal('labModal')">
-                        <i class="fas fa-microscope"></i>
                         <h3>Lab Notebook</h3>
                         <p>Add lab entry</p>
                     </div>
                     <div class="info-card launcher" onclick="openModal('resourceModal')">
-                        <i class="fas fa-archive"></i>
                         <h3>Resource Vault</h3>
                         <p>Upload a resource</p>
                     </div>
@@ -278,7 +284,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <section class="todo-section">
                 <div class="tool-card">
                     <div class="tool-header">
-                        <h3><i class="fas fa-tasks"></i> Study To-Do List</h3>
+                        <h3>Study To-Do List</h3>
                         <p>Manage your study tasks and assignments</p>
                     </div>
                     <div class="tool-content">
@@ -329,7 +335,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <section class="study-section">
                 <div class="tool-card">
                     <div class="tool-header">
-                        <h3><i class="fas fa-chart-line"></i> Study Tracker</h3>
+                        <h3>Study Tracker</h3>
                         <p>Log your study hours and track progress</p>
                     </div>
                     <div class="tool-content">
@@ -356,9 +362,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                         <div class="entry-info">
                                             <h5><?php echo htmlspecialchars($entry['subject']); ?></h5>
                                             <p><?php echo $entry['hours_studied']; ?> hours on <?php echo format_date($entry['entry_date']); ?></p>
+                                            <?php if (isset($entry['user_name'])): ?>
+                                                <p style="font-size: 0.85rem; opacity: 0.7;">by <?php echo htmlspecialchars($entry['user_name']); ?></p>
+                                            <?php endif; ?>
                                             <?php if ($entry['task_description']): ?>
                                                 <p class="entry-description"><?php echo htmlspecialchars($entry['task_description']); ?></p>
                                             <?php endif; ?>
+                                        </div>
+                                        <div class="entry-actions" style="display: flex; gap: 0.5rem;">
+                                            <form method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this study entry?')">
+                                                <input type="hidden" name="action" value="delete_study_entry">
+                                                <input type="hidden" name="id" value="<?php echo $entry['id']; ?>">
+                                                <button type="submit" class="btn-icon" title="Delete entry">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
@@ -372,7 +390,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <section class="flashcard-section">
                 <div class="tool-card">
                     <div class="tool-header">
-                        <h3><i class="fas fa-cards-blank"></i> Flashcard Generator</h3>
+                        <h3>Flashcard Generator</h3>
                         <p>Create and review medical flashcards</p>
                     </div>
                     <div class="tool-content">
@@ -391,6 +409,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <div class="flashcard-grid">
                                 <?php foreach ($flashcards as $card): ?>
                                     <div class="flashcard-container">
+                                        <?php if (isset($card['user_name'])): ?>
+                                            <div style="font-size: 0.75rem; opacity: 0.7; margin-bottom: 0.25rem;">by <?php echo htmlspecialchars($card['user_name']); ?></div>
+                                        <?php endif; ?>
                                         <div class="flashcard" onclick="flipCard(this)">
                                             <div class="card-front">
                                                 <h4><?php echo htmlspecialchars($card['front_text']); ?></h4>
@@ -421,7 +442,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <section class="lab-section">
                 <div class="tool-card">
                     <div class="tool-header">
-                        <h3><i class="fas fa-microscope"></i> Lab Notebook</h3>
+                        <h3>Lab Notebook</h3>
                         <p>Digital space for lab observations and protocols</p>
                     </div>
                     <div class="tool-content">
@@ -438,6 +459,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                             <h5><?php echo htmlspecialchars($entry['title']); ?></h5>
                                             <span class="entry-date"><?php echo format_date($entry['entry_date']); ?></span>
                                         </div>
+                                        <?php if (isset($entry['user_name'])): ?>
+                                            <p style="font-size: 0.85rem; opacity: 0.7; margin-bottom: 0.5rem;">by <?php echo htmlspecialchars($entry['user_name']); ?></p>
+                                        <?php endif; ?>
                                         <div class="entry-content">
                                             <p><?php echo nl2br(htmlspecialchars($entry['content'])); ?></p>
                                         </div>
@@ -448,6 +472,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                                 <?php endforeach; ?>
                                             </div>
                                         <?php endif; ?>
+                                        <div class="entry-actions" style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                                            <form method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this lab entry?')">
+                                                <input type="hidden" name="action" value="delete_lab_entry">
+                                                <input type="hidden" name="id" value="<?php echo $entry['id']; ?>">
+                                                <button type="submit" class="btn-icon" title="Delete entry">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -460,7 +493,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <section class="resource-section">
                 <div class="tool-card">
                     <div class="tool-header">
-                        <h3><i class="fas fa-archive"></i> Resource Vault</h3>
+                        <h3>Resource Vault</h3>
                         <p>Secure upload for lecture slides, notes, and PDFs</p>
                     </div>
                     <div class="tool-content">
@@ -471,12 +504,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         </div>
                         
                         <div class="resource-list">
-                            <h4>Your Resources</h4>
+                            <h4>All Resources</h4>
                             <?php if (empty($resources)): ?>
                                 <p class="empty-state">No resources uploaded yet. Start building your study vault!</p>
                             <?php else: ?>
                                 <?php foreach ($resources as $resource): ?>
                                     <div class="resource-item" data-tags="<?php echo strtolower($resource['tags']); ?>">
+                                        <?php if (isset($resource['user_name'])): ?>
+                                            <div style="font-size: 0.75rem; opacity: 0.7; margin-bottom: 0.25rem;">by <?php echo htmlspecialchars($resource['user_name']); ?></div>
+                                        <?php endif; ?>
                                         <div class="resource-icon">
                                             <?php
                                             $file_extension = strtolower(pathinfo($resource['original_name'], PATHINFO_EXTENSION));

@@ -3,9 +3,18 @@
 
 function sanitize_input($data) {
     $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
+    // Only strip slashes if magic quotes are enabled (PHP < 5.4)
+    if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc()) {
+        $data = stripslashes($data);
+    }
+    // Don't use htmlspecialchars here - it converts special characters
+    // We'll escape when displaying, not when storing
     return $data;
+}
+
+// Function to sanitize for display (use this when outputting to HTML)
+function sanitize_for_display($data) {
+    return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
 }
 
 function is_logged_in() {

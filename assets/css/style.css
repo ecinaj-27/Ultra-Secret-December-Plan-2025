@@ -21,6 +21,305 @@ body {
     --primary-color: #ff69b4;
 }
 
+/* Dark Mode Styles */
+body.dark-mode {
+    background: #1a1a1a;
+    color: #e0e0e0;
+}
+
+body.dark-mode :root {
+    --bg-color: #2d2d2d;
+    --card-bg: #2d2d2d;
+    --text-color: #e0e0e0;
+    --text-muted: #b0b0b0;
+    --border-color: #404040;
+    --primary-color: #ff69b4;
+}
+
+body.dark-mode .main-content {
+    background: #1a1a1a;
+    color: #e0e0e0;
+}
+
+body.dark-mode .tool-card,
+body.dark-mode .info-card,
+body.dark-mode .post-card,
+body.dark-mode .media-card,
+body.dark-mode .location-card,
+body.dark-mode .home-container,
+body.dark-mode .dashboard-card,
+body.dark-mode .letter-container,
+body.dark-mode .stat-item,
+body.dark-mode #moreLockModal .modal-content {
+    background: #2d2d2d;
+    border: 1px solid #555;
+    border-color: #555;
+    color: #e0e0e0;
+}
+
+/* Make all card borders more visible in dark mode */
+body.dark-mode .card,
+body.dark-mode .dashboard-card,
+body.dark-mode .post-card,
+body.dark-mode .media-card,
+body.dark-mode .info-card,
+body.dark-mode .tool-card {
+    border: 1px solid #555 !important;
+}
+
+body.dark-mode .profile-card,
+body.dark-mode .profile-content,
+body.dark-mode .profile-form,
+body.dark-mode .profile-picture-section {
+    background: #2d2d2d;
+    border: 1px solid #555;
+    color: #e0e0e0;
+}
+
+body.dark-mode .profile-header h1 {
+    color: #e0e0e0;
+}
+
+/* Dark mode for profile form inputs */
+body.dark-mode .profile-form input,
+body.dark-mode .profile-form textarea,
+body.dark-mode .profile-form select {
+    background: #2d2d2d;
+    border-color: #555;
+    color: #e0e0e0;
+}
+
+body.dark-mode .profile-form label {
+    color: #e0e0e0;
+}
+
+body.dark-mode .profile-form small {
+    color: #b0b0b0;
+}
+
+/* Dark mode for add media form */
+body.dark-mode .admin-form,
+body.dark-mode .media-form,
+body.dark-mode .playlist-edit-form {
+    background: #2d2d2d;
+    border: 1px solid #555;
+    color: #e0e0e0;
+}
+
+body.dark-mode .admin-form .form-group label,
+body.dark-mode .media-form .form-group label,
+body.dark-mode .playlist-edit-form .form-group label {
+    color: #e0e0e0;
+}
+
+body.dark-mode .admin-form .form-group input,
+body.dark-mode .admin-form .form-group textarea,
+body.dark-mode .admin-form .form-group select,
+body.dark-mode .media-form .form-group input,
+body.dark-mode .media-form .form-group textarea,
+body.dark-mode .media-form .form-group select,
+body.dark-mode .playlist-edit-form .form-group input,
+body.dark-mode .playlist-edit-form .form-group textarea,
+body.dark-mode .playlist-edit-form .form-group select {
+    background: #1a1a1a;
+    border-color: #555;
+    color: #e0e0e0;
+}
+
+body.dark-mode .admin-form .form-group input:focus,
+body.dark-mode .admin-form .form-group textarea:focus,
+body.dark-mode .admin-form .form-group select:focus,
+body.dark-mode .media-form .form-group input:focus,
+body.dark-mode .media-form .form-group textarea:focus,
+body.dark-mode .media-form .form-group select:focus,
+body.dark-mode .playlist-edit-form .form-group input:focus,
+body.dark-mode .playlist-edit-form .form-group textarea:focus {
+    border-color: #87CEEB;
+    background: #2d2d2d;
+}
+
+body.dark-mode .form-help {
+    color: #b0b0b0;
+}
+
+/* Preserve post card highlight colors in dark mode */
+body.dark-mode .post-card.post-love_letter {
+    border-left: 4px solid #87CEEB;
+}
+
+body.dark-mode .post-card.post-note {
+    border-left: 4px solid #4CAF50;
+}
+
+body.dark-mode .post-card.post-compliment {
+    border-left: 4px solid #FF9800;
+}
+
+body.dark-mode .sidebar {
+    background: #1a1a1a;
+    border-right-color: #404040;
+}
+
+body.dark-mode .nav-link {
+    color: #e0e0e0;
+}
+
+body.dark-mode .nav-link:hover {
+    background: #2d2d2d;
+}
+
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select {
+    background: #2d2d2d;
+    border-color: #404040;
+    color: #e0e0e0;
+}
+
+body.dark-mode .modal-content {
+    background: #2d2d2d;
+    color: #e0e0e0;
+}
+
+body.dark-mode .modal-header {
+    background: #1a1a1a;
+    border-bottom-color: #404040;
+}
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+    color: #e0e0e0;
+}
+
+body.dark-mode .page-header h1,
+body.dark-mode .section-header h2 {
+    color: #e0e0e0;
+}
+
+body.dark-mode .btn {
+    background: #5dade2;
+    color: white;
+}
+
+body.dark-mode .btn:hover {
+    background: #3498db;
+}
+
+body.dark-mode .btn-secondary {
+    background: #404040;
+    color: #e0e0e0;
+}
+
+body.dark-mode .btn-secondary:hover {
+    background: #505050;
+}
+
+/* Dark mode for calendar */
+body.dark-mode .calendar-widget,
+body.dark-mode .calendar-grid,
+body.dark-mode .calendar-day,
+body.dark-mode .calendar-day-header,
+body.dark-mode .calendar-expanded,
+body.dark-mode .calendar-todo-section,
+body.dark-mode .calendar-todo-item {
+    background: #2d2d2d;
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+body.dark-mode .calendar-day-header {
+    background: #1a1a1a;
+    color: #b0b0b0;
+}
+
+body.dark-mode .calendar-day {
+    background: #2d2d2d;
+    color: #e0e0e0;
+}
+
+body.dark-mode .calendar-day:hover {
+    background: #404040;
+}
+
+body.dark-mode .calendar-day.today {
+    background: #4CAF50;
+    color: white;
+}
+
+body.dark-mode .calendar-day.empty {
+    background: #1a1a1a;
+}
+
+body.dark-mode .calendar-header h4 {
+    color: #e0e0e0;
+}
+
+body.dark-mode .calendar-todo-item h6 {
+    color: #e0e0e0;
+}
+
+body.dark-mode .calendar-todo-item p {
+    color: #b0b0b0;
+}
+
+/* Dark mode for key features */
+body.dark-mode .features-list {
+    background: #2d2d2d;
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+body.dark-mode .features-list h3 {
+    color: #e0e0e0;
+}
+
+body.dark-mode .features-list li {
+    color: #e0e0e0;
+}
+
+/* Dark mode for unlock container (moreLockModal) */
+body.dark-mode #moreLockModal .modal-content {
+    background: #2d2d2d;
+    color: #e0e0e0;
+}
+
+body.dark-mode #more-links {
+    background: #2d2d2d;
+}
+
+body.dark-mode #more-links .dropdown-item {
+    color: #e0e0e0;
+}
+
+body.dark-mode #more-links .dropdown-item:hover {
+    background: #404040;
+}
+
+/* Dark mode for love songs containers */
+body.dark-mode .playlist-container,
+body.dark-mode .playlist-card,
+body.dark-mode .spotify-track-card,
+body.dark-mode .playlist-edit-form {
+    background: #2d2d2d;
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+body.dark-mode .playlist-info h3,
+body.dark-mode .playlist-header h3,
+body.dark-mode .track-header h4 {
+    color: #e0e0e0;
+}
+
+body.dark-mode .playlist-info p,
+body.dark-mode .track-description {
+    color: #b0b0b0;
+}
+
 /* Wide layout overrides */
 @media (min-width: 992px) {
     .navbar-container,
@@ -130,7 +429,7 @@ body {
 .logo i {
     font-size: 4rem;
     margin-bottom: 1rem;
-    color: #ffadad;
+    color: #87CEEB;
     animation: heartbeat 2s infinite;
 }
 
@@ -169,25 +468,26 @@ body {
 }
 
 .btn-primary {
-    background: #ffadad;
+    background: #87CEEB;
     color: white;
 }
 
 .btn-primary:hover {
-    background: #ffc6ff;
+    background: #B0E0E6;
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(255, 198, 255, 0.4);
+    box-shadow: 0 5px 15px rgba(176, 224, 230, 0.4);
 }
 
 .btn-secondary {
-    background: transparent;
-    color: white;
-    border: 2px solid white;
+    background: #f8f9fa;
+    color: #333;
+    border: 2px solid #e1e5e9;
 }
 
 .btn-secondary:hover {
-    background: white;
-    color: #9bf6ff;
+    background: #e9ecef;
+    color: #333;
+    border-color: #87CEEB;
     transform: translateY(-2px);
 }
 
@@ -214,7 +514,7 @@ body {
 .feature i {
     font-size: 2.5rem;
     margin-bottom: 1rem;
-    color: #ffadad;
+    color: #87CEEB;
 }
 
 .feature h3 {
@@ -252,7 +552,7 @@ body {
 
 .auth-header i {
     font-size: 3rem;
-    color: #ffadad;
+    color: #87CEEB;
     margin-bottom: 1rem;
 }
 
@@ -283,7 +583,7 @@ body {
 
 .form-group label i {
     margin-right: 0.5rem;
-    color: #ffadad;
+    color: #87CEEB;
 }
 
 .form-group input {
@@ -297,7 +597,7 @@ body {
 
 .form-group input:focus {
     outline: none;
-    border-color: #ffadad;
+    border-color: #87CEEB;
 }
 
 .passcode-hint {
@@ -342,7 +642,7 @@ body {
 }
 
 .auth-footer a {
-    color: #ffadad;
+    color: #87CEEB;
     text-decoration: none;
     font-weight: 500;
 }
@@ -367,18 +667,18 @@ body {
 .passcode-link {
     display: inline-flex;
     align-items: center;
-    color: #ffadad;
+    color: #87CEEB;
     text-decoration: none;
     font-size: 0.9rem;
     margin: 0.5rem 0;
     padding: 0.5rem 1rem;
-    border: 1px solid #ffadad;
+    border: 1px solid #87CEEB;
     border-radius: 20px;
     transition: all 0.3s ease;
 }
 
 .passcode-link:hover {
-    background: #ffadad;
+    background: #87CEEB;
     color: white;
     transform: translateY(-2px);
 }
@@ -416,7 +716,7 @@ body {
 
 .sidebar-toggle:hover {
     background: #f8f9fa;
-    border-color: #ffadad;
+    border-color: #87CEEB;
     transform: translateY(-2px);
 }
 
@@ -473,7 +773,7 @@ body {
 }
 
 .sidebar-brand i {
-    color: #ffadad;
+    color: #87CEEB;
     margin-right: 0.5rem;
     font-size: 1.5rem;
 }
@@ -510,7 +810,7 @@ body {
 
 .sidebar-close:hover {
     background: #f8f9fa;
-    color: #ffadad;
+    color: #87CEEB;
 }
 
 .sidebar-menu {
@@ -541,9 +841,9 @@ body {
 
 .nav-link:hover {
     background: #f8f9fa;
-    color: #ffadad;
+    color: #87CEEB;
     transform: translateX(4px);
-    box-shadow: 0 2px 8px rgba(255, 173, 173, 0.15);
+    box-shadow: 0 2px 8px rgba(135, 206, 235, 0.15);
 }
 
 .nav-link i {
@@ -575,7 +875,7 @@ body {
     color: white;
     text-decoration: none;
     width: 100%;
-    box-shadow: 0 2px 8px rgba(255, 173, 173, 0.3);
+    box-shadow: 0 2px 8px rgba(135, 206, 235, 0.3);
 }
 
 .sidebar-user .user-button:hover {
@@ -699,7 +999,7 @@ body {
     color: white;
     text-decoration: none;
     min-width: 120px;
-    box-shadow: 0 2px 8px rgba(255, 173, 173, 0.3);
+    box-shadow: 0 2px 8px rgba(135, 206, 235, 0.3);
 }
 
 .user-nav-item .user-button:hover {
@@ -904,7 +1204,7 @@ body {
 }
 
 .user-link:hover {
-    color: #ffc6ff;
+    color: #B0E0E6;
 }
 
 .current-date {
@@ -940,7 +1240,7 @@ body {
 
 .card-header i {
     font-size: 1.5rem;
-    color: #ffadad;
+    color: #87CEEB;
     margin-right: 0.75rem;
 }
 
@@ -952,7 +1252,7 @@ body {
 .view-all {
     position: absolute;
     right: 0;
-    color: #ffadad;
+    color: #87CEEB;
     text-decoration: none;
     font-size: 0.9rem;
     font-weight: 500;
@@ -969,7 +1269,7 @@ body {
 .countdown-number {
     font-size: 2.6rem;
     font-weight: 700;
-    color: #ffadad;
+    color: #87CEEB;
     line-height: 1;
 }
 
@@ -1089,7 +1389,7 @@ body {
 }
 
 .todo-category {
-    background: #ffadad;
+    background: #87CEEB;
     color: white;
     padding: 0.25rem 0.75rem;
     border-radius: 15px;
@@ -1154,7 +1454,7 @@ body {
 }
 
 .post-lightbox-close:hover {
-    color: #ffadad;
+    color: #87CEEB;
 }
 
 .post-lightbox-header {
@@ -1263,7 +1563,7 @@ body {
 .countdown-number {
     font-size: 2rem;
     font-weight: 700;
-    color: #ffadad;
+    color: #87CEEB;
     line-height: 1;
     margin-bottom: 0.5rem;
 }
@@ -1398,7 +1698,7 @@ body {
     margin: 0 auto 1rem;
     border-radius: 50%;
     overflow: hidden;
-    border: 4px solid #ffadad;
+    border: 4px solid #87CEEB;
 }
 
 .profile-picture img {
@@ -1438,7 +1738,7 @@ body {
 
 .stat-card i {
     font-size: 2rem;
-    color: #ffadad;
+    color: #87CEEB;
     margin-bottom: 1rem;
 }
 
@@ -1496,7 +1796,7 @@ body {
 }
 
 .section-header i {
-    color: #ffadad;
+    color: #87CEEB;
 }
 
 .timeline {
@@ -1511,7 +1811,7 @@ body {
     top: 0;
     bottom: 0;
     width: 2px;
-    background: #ffadad;
+    background: #87CEEB;
     transform: translateX(-50%);
 }
 
@@ -1535,11 +1835,11 @@ body {
     position: absolute;
     width: 20px;
     height: 20px;
-    background: #ffadad;
+    background: #87CEEB;
     border-radius: 50%;
     top: 0;
     border: 4px solid white;
-    box-shadow: 0 0 0 4px #ffadad;
+    box-shadow: 0 0 0 4px #87CEEB;
 }
 
 .timeline-item:nth-child(odd) .timeline-dot {
@@ -1558,7 +1858,7 @@ body {
 }
 
 .timeline-date {
-    color: #ffadad;
+    color: #87CEEB;
     font-weight: 600;
     margin-bottom: 0.5rem;
 }
@@ -1587,8 +1887,9 @@ body {
 /* New Horizontal Timeline Styles */
 .timeline-container {
     position: relative;
-    height: 100px;
+    height: 120px;
     margin: 3rem 0;
+    min-height: 120px;
 }
 
 .timeline-line {
@@ -1597,7 +1898,7 @@ body {
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, #ffadad, #ffc6ff, #ffadad);
+    background: linear-gradient(90deg, #87CEEB, #B0E0E6, #87CEEB);
     transform: translateY(-50%);
     border-radius: 2px;
 }
@@ -1613,18 +1914,49 @@ body {
     transform: translate(-50%, -50%);
     width: 30px;
     height: 30px;
-    background: #ffadad;
+    background: #87CEEB;
     border-radius: 50%;
     border: 4px solid white;
-    box-shadow: 0 0 0 4px #ffadad, 0 4px 15px rgba(255, 173, 173, 0.3);
+    box-shadow: 0 0 0 4px #87CEEB, 0 4px 15px rgba(135, 206, 235, 0.3);
     cursor: pointer;
-    transition: all 0.3s ease;
     z-index: 10;
+    display: block;
+    visibility: visible;
+    transition: all 0.3s ease;
 }
 
 .timeline-dot:hover {
     transform: translate(-50%, -50%) scale(1.2);
-    box-shadow: 0 0 0 6px #ffadad, 0 6px 20px rgba(255, 173, 173, 0.4);
+    box-shadow: 0 0 0 6px #87CEEB, 0 6px 20px rgba(135, 206, 235, 0.4);
+}
+
+.timeline-dot-label {
+    position: absolute;
+    top: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #333;
+    background: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 20;
+}
+
+.timeline-dot:hover .timeline-dot-label {
+    opacity: 1;
+}
+
+body.dark-mode .timeline-dot-label {
+    background: #2d2d2d;
+    color: #e0e0e0;
+    border: 1px solid #404040;
 }
 
 .dot-inner {
@@ -1640,7 +1972,7 @@ body {
 }
 
 .timeline-dot:hover .dot-inner {
-    background: #ffadad;
+    background: #87CEEB;
 }
 
 /* Polaroid Popup Styles */
@@ -1668,7 +2000,7 @@ body {
     position: absolute;
     top: -15px;
     right: -15px;
-    background: #ffadad;
+    background: #87CEEB;
     color: white;
     border: none;
     border-radius: 50%;
@@ -1797,7 +2129,7 @@ body {
 }
 
 #location-lightbox-date {
-    color: #ffadad;
+    color: #87CEEB;
     font-weight: 600;
     margin-bottom: 1rem;
     font-size: 0.9rem;
@@ -1816,7 +2148,7 @@ body {
     padding: 1rem;
     background: #f8f9fa;
     border-radius: 8px;
-    border-left: 4px solid #ffadad;
+    border-left: 4px solid #87CEEB;
 }
 
 /* Admin Management Styles */
@@ -1862,7 +2194,7 @@ body {
 }
 
 .timeline-date, .location-date {
-    color: #ffadad;
+    color: #87CEEB;
     font-weight: 600;
     font-size: 0.9rem;
     margin-bottom: 0.5rem;
@@ -1994,7 +2326,7 @@ body {
 
 .visit-date i {
     margin-right: 0.5rem;
-    color: #ffadad;
+    color: #87CEEB;
 }
 
 .stats-grid {
@@ -2014,7 +2346,7 @@ body {
 .stat-number {
     font-size: 3rem;
     font-weight: 700;
-    color: #ffadad;
+    color: #87CEEB;
     margin-bottom: 0.5rem;
 }
 .dashboard-card.compact {
@@ -2089,12 +2421,12 @@ body {
 }
 
 .compliment-card {
-    background: linear-gradient(135deg, #ffadad, #ffc6ff);
+    background: linear-gradient(135deg, #87CEEB, #B0E0E6);
     color: white;
     border-radius: 20px;
     padding: 2rem;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(255, 173, 173, 0.3);
+    box-shadow: 0 10px 30px rgba(135, 206, 235, 0.3);
 }
 
 .compliment-header {
@@ -2147,8 +2479,9 @@ body {
 
 .posts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 280px));
+    gap: 1.5rem;
+    justify-content: center;
 }
 
 .post-card {
@@ -2157,6 +2490,12 @@ body {
     padding: 1.5rem;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
+    width: 280px;
+    min-height: 280px;
+    max-height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .post-card:hover {
@@ -2164,7 +2503,7 @@ body {
 }
 
 .post-card.post-love_letter {
-    border-left: 4px solid #ffadad;
+    border-left: 4px solid #87CEEB;
 }
 
 .post-card.post-note {
@@ -2203,6 +2542,19 @@ body {
 .post-content {
     margin-bottom: 1rem;
     line-height: 1.6;
+    max-height: 120px;
+    overflow: hidden;
+    position: relative;
+    flex-grow: 1;
+}
+
+.post-content.expanded {
+    max-height: none;
+}
+
+.post-card .post-expand {
+    margin-top: auto;
+    padding-top: 1rem;
 }
 
 .post-actions {
@@ -2213,8 +2565,8 @@ body {
 
 .btn-icon {
     background: none;
-    border: none;
-    color: #666;
+    border: #3b4c80;
+    color: #0d193d;
     cursor: pointer;
     padding: 0.5rem;
     border-radius: 5px;
@@ -2223,7 +2575,7 @@ body {
 
 .btn-icon:hover {
     background: #f0f0f0;
-    color: #ffadad;
+    color: #409bbf;
 }
 
 .empty-state {
@@ -2332,14 +2684,14 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    color: #ffadad;
+    color: #87CEEB;
     text-decoration: none;
     font-weight: 500;
     transition: color 0.3s ease;
 }
 
 .watch-link:hover {
-    color: #ffc6ff;
+    color: #B0E0E6;
 }
 
 .playlist-container {
@@ -2520,10 +2872,10 @@ body {
 
 .about-nav-link:hover,
 .about-nav-link.active {
-    background: #ffadad;
+    background: #87CEEB;
     color: white;
     transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(255, 173, 173, 0.3);
+    box-shadow: 0 5px 20px rgba(135, 206, 235, 0.3);
 }
 
 .about-section {
@@ -2544,7 +2896,7 @@ body {
 }
 
 .section-content h2 i {
-    color: #ffadad;
+    color: #87CEEB;
 }
 
 .info-grid {
@@ -2569,7 +2921,7 @@ body {
 
 .info-card i {
     font-size: 3rem;
-    color: #ffadad;
+    color: #87CEEB;
     margin-bottom: 1rem;
 }
 
@@ -2623,7 +2975,7 @@ body {
     top: 0;
     bottom: 0;
     width: 2px;
-    background: #ffadad;
+    background: #87CEEB;
     transform: translateX(-50%);
 }
 
@@ -2644,7 +2996,7 @@ body {
 }
 
 .story-date {
-    color: #ffadad;
+    color: #87CEEB;
     font-weight: 600;
     margin-bottom: 0.5rem;
     font-size: 1.1rem;
@@ -2661,6 +3013,32 @@ body {
     font-size: 1.3rem;
     margin-bottom: 1rem;
     color: #333;
+}
+
+.story-text {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #333;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.story-text p {
+    margin-bottom: 1.5rem;
+    text-align: justify;
+}
+
+body.dark-mode .story-content {
+    background: #2d2d2d;
+    color: #e0e0e0;
+}
+
+body.dark-mode .story-text {
+    color: #e0e0e0;
+}
+
+body.dark-mode .story-text p {
+    color: #e0e0e0;
 }
 
 .letter-container {
@@ -2694,7 +3072,7 @@ body {
     text-align: right;
     font-style: italic;
     margin-top: 2rem;
-    color: #ffadad;
+    color: #87CEEB;
     font-weight: 500;
 }
 
@@ -2746,7 +3124,7 @@ body {
 }
 
 .tool-header h3 i {
-    color: #ffadad;
+    color: #87CEEB;
 }
 
 .tool-header p {
@@ -2813,7 +3191,7 @@ body {
 }
 
 .category {
-    background: #ffadad;
+    background: #87CEEB;
     color: white;
     padding: 0.25rem 0.75rem;
     border-radius: 15px;
@@ -2913,11 +3291,11 @@ body {
     padding: 1rem;
     background: #f8f9fa;
     border-radius: 10px;
-    border-left: 4px solid #ffadad;
+    border-left: 4px solid #87CEEB;
 }
 
 .art-story i {
-    color: #ffadad;
+    color: #87CEEB;
     margin-right: 0.5rem;
 }
 
@@ -3145,7 +3523,7 @@ body {
 }
 
 .form-container h3 i {
-    color: #ffadad;
+    color: #87CEEB;
 }
 
 .media-form .form-row {
@@ -3180,7 +3558,7 @@ body {
 .media-form .form-group select:focus,
 .media-form .form-group textarea:focus {
     outline: none;
-    border-color: #ffadad;
+    border-color: #87CEEB;
 }
 
 .form-actions {
@@ -3262,7 +3640,7 @@ body {
 }
 
 .playlist-btn {
-    background: #ffadad;
+    background: #87CEEB;
     color: white;
     border: none;
     padding: 0.75rem 1.5rem;
@@ -3276,7 +3654,7 @@ body {
 }
 
 .playlist-btn:hover {
-    background: #ffc6ff;
+    background: #B0E0E6;
     transform: translateY(-2px);
 }
 
@@ -3326,8 +3704,8 @@ body {
 .edit-form .form-group input:focus,
 .edit-form .form-group textarea:focus {
     outline: none;
-    border-color: #ffadad;
-    box-shadow: 0 0 0 3px rgba(255, 173, 173, 0.1);
+    border-color: #87CEEB;
+    box-shadow: 0 0 0 3px rgba(135, 206, 235, 0.1);
 }
 
 .edit-form .form-group textarea {
@@ -3689,7 +4067,8 @@ body {
 .spotify-embed iframe {
     border-radius: 10px;
     width: 100%;
-    height: 152px;
+    height: 352px;
+    min-height: 352px;
 }
 
 /* Ensure admin edit/delete buttons are clickable above embeds */
@@ -3729,14 +4108,14 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    color: #ffadad;
+    color: #87CEEB;
     text-decoration: none;
     font-weight: 500;
     transition: color 0.3s ease;
 }
 
 .external-link:hover {
-    color: #ffc6ff;
+    color: #B0E0E6;
 }
 
 .form-help {
