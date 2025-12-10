@@ -23,29 +23,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $database = new Database();
         $db = $database->getConnection();
         
-        // Check if username already exists
-        $query = "SELECT id FROM users WHERE username = :username";
-        $stmt = $db->prepare($query);
-        $stmt->bindParam(':username', $username);
-        $stmt->execute();
-        
-        if ($stmt->fetch()) {
-            $error_message = 'Username already exists';
+        // Check if database connection was successful
+        if ($db === null) {
+            $error_message = 'Database connection failed. Please ensure MySQL is running and try again.';
         } else {
-            // Create new user
-            $hashed_passcode = password_hash($passcode, PASSWORD_DEFAULT);
-            $query = "INSERT INTO users (username, passcode, name, email, password_hint) VALUES (:username, :passcode, :name, :email, :password_hint)";
+            // Check if username already exists
+            $query = "SELECT id FROM users WHERE username = :username";
             $stmt = $db->prepare($query);
             $stmt->bindParam(':username', $username);
-            $stmt->bindParam(':passcode', $hashed_passcode);
-            $stmt->bindParam(':name', $name);
-            $stmt->bindParam(':email', $email);
-            $stmt->bindParam(':password_hint', $password_hint);
+            $stmt->execute();
             
-            if ($stmt->execute()) {
-                $success_message = 'Account created successfully! You can now login.';
+            if ($stmt->fetch()) {
+                $error_message = 'Username already exists';
             } else {
-                $error_message = 'Error creating account. Please try again.';
+                // Create new user
+                $hashed_passcode = password_hash($passcode, PASSWORD_DEFAULT);
+                $query = "INSERT INTO users (username, passcode, name, email, password_hint) VALUES (:username, :passcode, :name, :email, :password_hint)";
+                $stmt = $db->prepare($query);
+                $stmt->bindParam(':username', $username);
+                $stmt->bindParam(':passcode', $hashed_passcode);
+                $stmt->bindParam(':name', $name);
+                $stmt->bindParam(':email', $email);
+                $stmt->bindParam(':password_hint', $password_hint);
+                
+                if ($stmt->execute()) {
+                    $success_message = 'Account created successfully! You can now login.';
+                } else {
+                    $error_message = 'Error creating account. Please try again.';
+                }
             }
         }
     }
@@ -126,3 +131,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <script src="assets/js/passcode.js"></script>
 </body>
 </html>
+                

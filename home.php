@@ -77,6 +77,13 @@ $recent_resources = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <h1>Good <?php echo $greeting; ?>, <a href="profile.php" class="user-link"><?php echo htmlspecialchars($user['name']); ?></a></h1>
                 <p class="current-date"><?php echo $current_date; ?></p>
                 <div class="time-display" id="live-time"></div>
+                <div class="time-toggle">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="time-visibility-toggle" checked>
+                        <span class="switch-slider"></span>
+                        <span class="toggle-label">Show time &amp; date</span>
+                    </label>
+                </div>
             </div>
             
             <!-- Main Dashboard -->

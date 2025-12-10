@@ -420,7 +420,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
         }
     </style>
 </head>
-<body>
+<body class="page-flower-bg">
     <?php include 'includes/navbar.php'; ?>
     
     <main class="main-content">

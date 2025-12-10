@@ -307,9 +307,123 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
         .photo-item.empty i {
             opacity: 0.3;
         }
+
+        /* Photo capture section */
+        .capture-section {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 3rem;
+            border: 1px solid #e1e5e9;
+        }
+
+        .capture-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            color: #0f172a;
+        }
+
+        .capture-header h2 {
+            margin: 0;
+        }
+
+        .capture-help {
+            color: #4b5563;
+            margin: 0 0 1.25rem 0;
+        }
+
+        .capture-grid {
+            display: grid;
+            grid-template-columns: minmax(320px, 1fr) 1fr;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .capture-preview {
+            position: relative;
+            background: #0b1224;
+            border-radius: 12px;
+            overflow: hidden;
+            min-height: 260px;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05), 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .capture-preview video,
+        .capture-preview canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        .capture-placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #d1d5db;
+            gap: 0.5rem;
+            background: linear-gradient(145deg, rgba(15,23,42,0.85), rgba(15,23,42,0.65));
+            text-align: center;
+            padding: 1rem;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+        }
+
+        .capture-placeholder.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .capture-placeholder i {
+            font-size: 2rem;
+        }
+
+        .capture-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .capture-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .capture-actions .btn {
+            margin: 0;
+        }
+
+        .capture-actions .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .capture-status {
+            color: #374151;
+            font-size: 0.95rem;
+        }
+
+        .capture-status.success {
+            color: #047857;
+        }
+
+        .capture-status.error {
+            color: #b91c1c;
+        }
+
+        @media (max-width: 900px) {
+            .capture-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
-<body>
+<body class="page-flower-bg">
     <?php include 'includes/navbar.php'; ?>
     
     <main class="main-content">
@@ -320,6 +434,45 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
                 <?php if (isset($_GET['uploaded'])): ?>
                     <div class="alert alert-success">Photo uploaded successfully!</div>
                 <?php endif; ?>
+            </div>
+
+            <div class="capture-section">
+                <div class="capture-header">
+                    <i class="fas fa-camera-retro"></i>
+                    <h2>Take a Photo</h2>
+                </div>
+                <p class="capture-help">Turn on your camera, snap a photo, and we will save it straight into the Photo Booth.</p>
+                <div class="capture-grid">
+                    <div class="capture-preview">
+                        <video id="capture-video" autoplay playsinline muted></video>
+                        <canvas id="capture-canvas" style="display:none;"></canvas>
+                        <div class="capture-placeholder" id="capture-placeholder">
+                            <i class="fas fa-video"></i>
+                            <span>Start the camera to preview</span>
+                        </div>
+                    </div>
+                    <div class="capture-controls">
+                        <div class="form-group">
+                            <label for="capture-caption">Caption (optional)</label>
+                            <textarea id="capture-caption" rows="3" placeholder="Add a caption for this snap..."></textarea>
+                        </div>
+                        <div class="capture-actions">
+                            <button type="button" class="btn btn-secondary" id="start-camera-btn">
+                                <i class="fas fa-play"></i> Start Camera
+                            </button>
+                            <button type="button" class="btn btn-primary" id="capture-photo-btn" disabled>
+                                <i class="fas fa-circle"></i> Capture
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="retake-photo-btn" disabled>
+                                <i class="fas fa-undo"></i> Retake
+                            </button>
+                            <button type="button" class="btn btn-primary" id="save-photo-btn" disabled>
+                                <i class="fas fa-cloud-upload-alt"></i> Save to Booth
+                            </button>
+                        </div>
+                        <div class="capture-status" id="capture-status">Camera is off.</div>
+                    </div>
+                </div>
             </div>
             
             <?php if ($is_admin): ?>
@@ -489,6 +642,144 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
             document.body.appendChild(form);
             form.submit();
         }
+
+        // Photo capture controls
+        (function initPhotoCapture() {
+            const video = document.getElementById('capture-video');
+            const canvas = document.getElementById('capture-canvas');
+            const placeholder = document.getElementById('capture-placeholder');
+            const captionInput = document.getElementById('capture-caption');
+            const startBtn = document.getElementById('start-camera-btn');
+            const captureBtn = document.getElementById('capture-photo-btn');
+            const retakeBtn = document.getElementById('retake-photo-btn');
+            const saveBtn = document.getElementById('save-photo-btn');
+            const statusEl = document.getElementById('capture-status');
+
+            if (!video || !canvas || !startBtn || !captureBtn || !retakeBtn || !saveBtn) return;
+
+            let stream = null;
+            let capturedDataUrl = '';
+
+            function updateStatus(message, type = '') {
+                if (!statusEl) return;
+                statusEl.textContent = message;
+                statusEl.className = 'capture-status' + (type ? ` ${type}` : '');
+            }
+
+            async function startCamera() {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+                    video.srcObject = stream;
+                    video.style.display = 'block';
+                    canvas.style.display = 'none';
+                    captureBtn.disabled = false;
+                    retakeBtn.disabled = true;
+                    saveBtn.disabled = true;
+                    capturedDataUrl = '';
+                    placeholder.classList.add('hidden');
+                    updateStatus('Camera is on. Click Capture when ready.');
+                } catch (error) {
+                    updateStatus('Camera is blocked. Please allow access.', 'error');
+                    if (typeof showNotification === 'function') {
+                        showNotification('Camera access was blocked. Please enable it to take a photo.', 'error');
+                    }
+                }
+            }
+
+            function capturePhoto() {
+                if (!stream) {
+                    updateStatus('Start the camera first.', 'error');
+                    return;
+                }
+                const trackSettings = stream.getVideoTracks()[0]?.getSettings?.() || {};
+                canvas.width = trackSettings.width || video.videoWidth || 640;
+                canvas.height = trackSettings.height || video.videoHeight || 480;
+
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                capturedDataUrl = canvas.toDataURL('image/jpeg', 0.92);
+
+                canvas.style.display = 'block';
+                video.style.display = 'none';
+                captureBtn.disabled = true;
+                retakeBtn.disabled = false;
+                saveBtn.disabled = false;
+                updateStatus('Preview ready. Save it or retake if needed.');
+            }
+
+            function retakePhoto() {
+                capturedDataUrl = '';
+                canvas.style.display = 'none';
+                video.style.display = 'block';
+                captureBtn.disabled = false;
+                retakeBtn.disabled = true;
+                saveBtn.disabled = true;
+                updateStatus('Camera is on. Click Capture when ready.');
+            }
+
+            async function savePhoto() {
+                if (!capturedDataUrl) {
+                    updateStatus('Take a photo before saving.', 'error');
+                    return;
+                }
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Saving...';
+                updateStatus('Saving photo...', '');
+
+                try {
+                    const response = await fetch('api/photo-booth-capture.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            image: capturedDataUrl,
+                            caption: captionInput ? captionInput.value : ''
+                        })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        updateStatus('Saved! Reloading...', 'success');
+                        if (typeof showNotification === 'function') {
+                            showNotification('Photo saved to the Photo Booth!', 'success');
+                        }
+                        setTimeout(() => window.location.reload(), 700);
+                    } else {
+                        const message = data.message || 'Unable to save photo.';
+                        updateStatus(message, 'error');
+                        if (typeof showNotification === 'function') {
+                            showNotification(message, 'error');
+                        }
+                        saveBtn.disabled = false;
+                    }
+                } catch (err) {
+                    updateStatus('Network error while saving photo.', 'error');
+                    if (typeof showNotification === 'function') {
+                        showNotification('Network error while saving photo.', 'error');
+                    }
+                    saveBtn.disabled = false;
+                } finally {
+                    saveBtn.textContent = 'Save to Booth';
+                }
+            }
+
+            function stopCamera() {
+                if (stream) {
+                    stream.getTracks().forEach(t => t.stop());
+                    stream = null;
+                }
+                video.srcObject = null;
+                placeholder.classList.remove('hidden');
+                captureBtn.disabled = true;
+                retakeBtn.disabled = true;
+                saveBtn.disabled = true;
+                updateStatus('Camera is off.');
+            }
+
+            startBtn.addEventListener('click', startCamera);
+            captureBtn.addEventListener('click', capturePhoto);
+            retakeBtn.addEventListener('click', retakePhoto);
+            saveBtn.addEventListener('click', savePhoto);
+            window.addEventListener('beforeunload', stopCamera);
+        })();
     </script>
     
     <style>

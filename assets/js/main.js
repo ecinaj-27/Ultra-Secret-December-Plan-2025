@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Live time update
     updateLiveTime();
     setInterval(updateLiveTime, 1000);
+    initTimeVisibilityToggle();
     
     // Initialize calendar
     if (document.getElementById('calendar-widget')) {
@@ -177,6 +178,32 @@ function updateLiveTime() {
         });
         dateElement.textContent = dateString;
     }
+}
+
+// Show/hide time & date toggle
+function initTimeVisibilityToggle() {
+    const toggle = document.getElementById('time-visibility-toggle');
+    const timeElement = document.getElementById('live-time');
+    const dateElement = document.querySelector('.current-date');
+    if (!toggle || !timeElement || !dateElement) return;
+
+    const savedPreference = localStorage.getItem('showTimeDate');
+    const shouldShow = savedPreference !== 'false';
+
+    toggle.checked = shouldShow;
+    applyTimeVisibility(shouldShow, timeElement, dateElement);
+
+    toggle.addEventListener('change', () => {
+        const show = toggle.checked;
+        applyTimeVisibility(show, timeElement, dateElement);
+        localStorage.setItem('showTimeDate', show);
+    });
+}
+
+function applyTimeVisibility(show, timeElement, dateElement) {
+    const displayValue = show ? '' : 'none';
+    timeElement.style.display = displayValue;
+    dateElement.style.display = displayValue;
 }
 
 // Calendar initialization

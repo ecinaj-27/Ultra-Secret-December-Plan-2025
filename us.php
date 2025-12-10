@@ -68,7 +68,7 @@ $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 </head>
-<body>
+<body class="page-flower-bg">
     <?php include 'includes/navbar.php'; ?>
     
     <main class="main-content">

@@ -12,6 +12,20 @@ body {
     min-height: 100vh;
 }
 
+body.page-flower-bg {
+    background-color: #a0c4ff;
+    background-image: url("../images/Untitled design.png");
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+
+body.page-flower-bg .main-content {
+    background: transparent;
+}
+
 :root {
     --bg-color: #ffffff;
     --card-bg: #ffffff;
@@ -27,11 +41,16 @@ body.dark-mode {
     color: #e0e0e0;
 }
 
+/* Override background for page-flower-bg pages in dark mode */
+body.dark-mode.page-flower-bg {
+    background: #0f172a url("../images/2.png") center bottom / cover fixed no-repeat !important;
+}
+
 body.dark-mode :root {
     --bg-color: #2d2d2d;
     --card-bg: #2d2d2d;
     --text-color: #e0e0e0;
-    --text-muted: #b0b0b0;
+    --text-muted: #d0d0d0;
     --border-color: #404040;
     --primary-color: #ff69b4;
 }
@@ -39,6 +58,11 @@ body.dark-mode :root {
 body.dark-mode .main-content {
     background: #1a1a1a;
     color: #e0e0e0;
+}
+
+/* Keep main-content transparent for page-flower-bg pages in dark mode */
+body.dark-mode.page-flower-bg .main-content {
+    background: transparent !important;
 }
 
 body.dark-mode .tool-card,
@@ -98,7 +122,7 @@ body.dark-mode .todo-text {
 }
 
 body.dark-mode .stat-label {
-    color: #b0b0b0;
+    color: #d0d0d0;
 }
 
 body.dark-mode .stat-number {
@@ -110,7 +134,7 @@ body.dark-mode .todo-category {
 }
 
 body.dark-mode .no-todos {
-    color: #b0b0b0;
+    color: #d0d0d0;
 }
 
 body.dark-mode .profile-card,
@@ -140,7 +164,7 @@ body.dark-mode .profile-form label {
 }
 
 body.dark-mode .profile-form small {
-    color: #b0b0b0;
+    color: #d0d0d0;
 }
 
 /* Dark mode for add media form */
@@ -185,7 +209,7 @@ body.dark-mode .playlist-edit-form .form-group textarea:focus {
 }
 
 body.dark-mode .form-help {
-    color: #b0b0b0;
+    color: #d0d0d0;
 }
 
 /* Preserve post card highlight colors in dark mode */
@@ -279,7 +303,7 @@ body.dark-mode .calendar-todo-item {
 
 body.dark-mode .calendar-day-header {
     background: #1a1a1a;
-    color: #b0b0b0;
+    color: #d0d0d0;
 }
 
 body.dark-mode .calendar-day {
@@ -309,7 +333,7 @@ body.dark-mode .calendar-todo-item h6 {
 }
 
 body.dark-mode .calendar-todo-item p {
-    color: #b0b0b0;
+    color: #d0d0d0;
 }
 
 /* Dark mode for key features */
@@ -363,7 +387,32 @@ body.dark-mode .track-header h4 {
 
 body.dark-mode .playlist-info p,
 body.dark-mode .track-description {
-    color: #b0b0b0;
+    color: #d0d0d0;
+}
+
+/* Make all gray text more readable in dark mode */
+body.dark-mode .page-header p,
+body.dark-mode .section-header p,
+body.dark-mode .empty-state,
+body.dark-mode .empty-state p,
+body.dark-mode .description,
+body.dark-mode .meta,
+body.dark-mode .date,
+body.dark-mode .time,
+body.dark-mode .caption,
+body.dark-mode .subtitle,
+body.dark-mode small,
+body.dark-mode .small,
+body.dark-mode .text-muted,
+body.dark-mode .muted {
+    color: #d0d0d0 !important;
+}
+
+/* Make paragraphs and text content more readable */
+body.dark-mode p:not(.card-header p):not(.post-content p),
+body.dark-mode .content p,
+body.dark-mode .text-content {
+    color: #e0e0e0 !important;
 }
 
 /* Wide layout overrides */
@@ -1237,6 +1286,50 @@ body.dark-mode .track-description {
     margin-bottom: 3rem;
 }
 
+.light-readability {
+    color: #0f172a;
+}
+
+.light-muted {
+    color: #1f2937;
+}
+
+/* Light mode readability tweaks */
+body:not(.dark-mode) .greeting-section h1,
+body:not(.dark-mode) .card-header h3,
+body:not(.dark-mode) .stat-label,
+body:not(.dark-mode) .todo-text,
+body:not(.dark-mode) .todo-category,
+body:not(.dark-mode) .nav-link span {
+    color: #0f172a;
+}
+
+body:not(.dark-mode) .user-link {
+    color: #0b3c7a;
+    font-weight: 700;
+}
+
+body:not(.dark-mode) .current-date {
+    color: #111827;
+    font-weight: 600;
+}
+
+body:not(.dark-mode) .time-display {
+    color: #0b1224;
+    font-weight: 700;
+}
+
+body:not(.dark-mode) .sidebar-user .user-button {
+    background: #e8f0ff;
+    border-color: #c7d2fe;
+    color: #0f172a;
+}
+
+body:not(.dark-mode) .sidebar-user .user-button:hover {
+    background: #dbeafe;
+    color: #0b1324;
+}
+
 .greeting-section h1 {
     font-size: 2.5rem;
     color: #1a1a1a;
@@ -1397,6 +1490,58 @@ body.dark-mode .track-description {
     color: #1a1a1a;
     text-align: center;
     font-family: 'Courier New', monospace;
+}
+
+.time-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.toggle-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #1f2937;
+    cursor: pointer;
+}
+
+.toggle-switch input {
+    display: none;
+}
+
+.switch-slider {
+    width: 42px;
+    height: 22px;
+    background: #d1d5db;
+    border-radius: 999px;
+    position: relative;
+    transition: background 0.2s ease;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.switch-slider::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    transition: transform 0.2s ease;
+}
+
+.toggle-switch input:checked + .switch-slider {
+    background: #4f46e5;
+}
+
+.toggle-switch input:checked + .switch-slider::after {
+    transform: translateX(20px);
 }
 
 .quote-content {
