@@ -150,8 +150,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
         .form-group input:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #ff6b6b;
-            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+            border-color: #87CEEB;
+            box-shadow: 0 0 0 3px rgba(135, 206, 235, 0.25);
         }
         
         .photo-grid {
@@ -247,7 +247,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
         }
         
         .btn {
-            background: #ff6b6b;
+            background: #87CEEB;
             color: white;
             border: none;
             padding: 0.75rem 1.5rem;
@@ -266,11 +266,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
         }
         
         .btn-primary {
-            background: #ff6b6b;
+            background: #87CEEB;
         }
         
         .btn-primary:hover {
-            background: #ff5252;
+            background: #6bb8ff;
         }
         
         /* Responsive Design */

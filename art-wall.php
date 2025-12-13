@@ -157,8 +157,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
         .form-group input:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #ff6b6b;
-            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+            border-color: #87CEEB;
+            box-shadow: 0 0 0 3px rgba(135, 206, 235, 0.25);
         }
         
         .masonry-grid {
@@ -218,7 +218,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(45deg, rgba(255, 107, 107, 0.9), rgba(255, 107, 107, 0.7));
+            background: linear-gradient(45deg, rgba(135, 206, 235, 0.9), rgba(135, 206, 235, 0.7));
             color: white;
             padding: 2rem;
             display: flex;
@@ -299,7 +299,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
         }
         
         .btn {
-            background: #ff6b6b;
+            background: #87CEEB;
             color: white;
             border: none;
             padding: 0.75rem 1.5rem;
@@ -314,15 +314,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
         }
         
         .btn:hover {
-            background: #ff5252;
+            background: #6bb8ff;
         }
         
         .btn-primary {
-            background: #ff6b6b;
+            background: #87CEEB;
         }
         
         .btn-primary:hover {
-            background: #ff5252;
+            background: #6bb8ff;
         }
         
         /* Art Popup Styles */
@@ -372,7 +372,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
         }
         
         .art-popup-close:hover {
-            color: #ff6b6b;
+            color: #87CEEB;
         }
         
         .art-popup-image {

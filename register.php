@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     
                     <input type="text" id="password_hint" name="password_hint" value="Anniversary Date" placeholder="Password Hint" required style="width: 100%; padding: 0.75rem; background: rgba(255, 255, 255, 0.3); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 10px; color: #333; font-size: 1rem; margin-bottom: 1.5rem;">
                     
-                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem; background: #ff6b6b; color: white; border: none; border-radius: 25px; cursor: pointer; font-size: 1rem; margin-bottom: 1rem;">
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem; background: #87CEEB; color: white; border: none; border-radius: 25px; cursor: pointer; font-size: 1rem; margin-bottom: 1rem;">
                         <i class="fas fa-user-plus"></i>
                         Create Account
                     </button>

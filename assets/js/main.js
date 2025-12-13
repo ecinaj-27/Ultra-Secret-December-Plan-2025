@@ -577,7 +577,7 @@ style.textContent = `
     }
     
     .todo-dot.lab {
-        background: #ff6b6b;
+        background: #87CEEB;
     }
     
     .todo-dot.school {
@@ -754,7 +754,7 @@ style.textContent = `
     }
     
     .tab-btn.active {
-        background: #ff6b6b;
+        background: #87CEEB;
         color: white;
     }
     
@@ -801,8 +801,8 @@ style.textContent = `
     .form-group input:focus,
     .form-group textarea:focus {
         outline: none;
-        border-color: #ff6b6b;
-        box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+        border-color: #87CEEB;
+        box-shadow: 0 0 0 3px rgba(135, 206, 235, 0.25);
     }
     
     .form-group textarea {
