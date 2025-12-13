@@ -115,7 +115,7 @@ $recent_resources = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <div class="card-header">
                         <i class="fas fa-tasks"></i>
                         <h3>Quick To-Do</h3>
-                        <a href="tools.php" class="view-all">View All</a>
+                        <a href="medbio.php" class="view-all">View All</a>
                     </div>
                     <div class="todo-list">
                         <?php if (empty($todo_items)): ?>

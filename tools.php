@@ -118,6 +118,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $event_date = $_POST['event_date'];
                 $caption = sanitize_input($_POST['caption']);
                 
+                // Validate and format date to prevent timezone issues
+                if ($event_date) {
+                    // Ensure date is in YYYY-MM-DD format
+                    $date_parts = explode('-', $event_date);
+                    if (count($date_parts) === 3) {
+                        $year = (int)$date_parts[0];
+                        $month = (int)$date_parts[1];
+                        $day = (int)$date_parts[2];
+                        // Reconstruct date to ensure proper format
+                        $event_date = sprintf('%04d-%02d-%02d', $year, $month, $day);
+                    }
+                }
+                
                 // Handle image upload
                 $image_path = '';
                 if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
@@ -145,6 +158,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $description = sanitize_input($_POST['description'] ?? '');
                 $event_date = $_POST['event_date'] ?? null;
                 $caption = sanitize_input($_POST['caption'] ?? '');
+                
+                // Validate and format date to prevent timezone issues
+                if ($event_date) {
+                    // Ensure date is in YYYY-MM-DD format
+                    $date_parts = explode('-', $event_date);
+                    if (count($date_parts) === 3) {
+                        $year = (int)$date_parts[0];
+                        $month = (int)$date_parts[1];
+                        $day = (int)$date_parts[2];
+                        // Reconstruct date to ensure proper format
+                        $event_date = sprintf('%04d-%02d-%02d', $year, $month, $day);
+                    }
+                }
                 
                 // Fetch existing to handle image replacement
                 $stmt = $db->prepare("SELECT image_path FROM timeline_events WHERE id = :id");
@@ -486,6 +512,27 @@ if ($is_admin) {
     $stmt->execute();
     $timeline_events = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
+    // Ensure event_date is in YYYY-MM-DD format for all events (prevent timezone issues)
+    foreach ($timeline_events as &$event) {
+        if ($event['event_date']) {
+            // Extract just the date part (YYYY-MM-DD) to avoid timezone conversion
+            $date_str = $event['event_date'];
+            if (strpos($date_str, ' ') !== false) {
+                // If it includes time, extract just the date part
+                $date_str = substr($date_str, 0, 10);
+            }
+            // Validate and format the date
+            $date_parts = explode('-', $date_str);
+            if (count($date_parts) === 3) {
+                $year = (int)$date_parts[0];
+                $month = (int)$date_parts[1];
+                $day = (int)$date_parts[2];
+                $event['event_date'] = sprintf('%04d-%02d-%02d', $year, $month, $day);
+            }
+        }
+    }
+    unset($event); // Break the reference
+    
     $query = "SELECT * FROM locations ORDER BY visit_date DESC";
     $stmt = $db->prepare($query);
     $stmt->execute();
@@ -623,7 +670,12 @@ if ($is_admin) {
                                             <?php endif; ?>
                                         </div>
                                         <div class="timeline-actions">
-                                            <button class="btn-icon" onclick="openEditTimelineEvent(<?php echo $event['id']; ?>, '<?php echo htmlspecialchars($event['title'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($event['description'] ?? '', ENT_QUOTES); ?>', '<?php echo htmlspecialchars($event['event_date'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($event['caption'] ?? '', ENT_QUOTES); ?>')">
+                                            <button class="btn-icon edit-timeline-btn" 
+                                                    data-id="<?php echo $event['id']; ?>"
+                                                    data-title="<?php echo htmlspecialchars($event['title'], ENT_QUOTES); ?>"
+                                                    data-description="<?php echo htmlspecialchars($event['description'] ?? '', ENT_QUOTES); ?>"
+                                                    data-date="<?php echo htmlspecialchars($event['event_date'], ENT_QUOTES); ?>"
+                                                    data-caption="<?php echo htmlspecialchars($event['caption'] ?? '', ENT_QUOTES); ?>">
                                                 <i class="fas fa-edit"></i>
                                             </button>
                                             <button class="btn-icon" onclick="deleteTimelineEvent(<?php echo $event['id']; ?>)">
@@ -1235,12 +1287,41 @@ if ($is_admin) {
         function openEditTimelineEvent(id, title, description, date, caption) {
             ensureTimelineModal();
             document.getElementById('edit_timeline_id').value = id;
-            document.getElementById('edit_timeline_title').value = title;
+            document.getElementById('edit_timeline_title').value = title || '';
             document.getElementById('edit_timeline_description').value = description || '';
-            document.getElementById('edit_timeline_date').value = date || '';
+            
+            // Fix date format - ensure it's YYYY-MM-DD
+            let dateValue = date || '';
+            if (dateValue) {
+                // If date is in a different format, convert it
+                const dateObj = new Date(dateValue);
+                if (!isNaN(dateObj.getTime())) {
+                    // Format as YYYY-MM-DD
+                    const year = dateObj.getFullYear();
+                    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                    const day = String(dateObj.getDate()).padStart(2, '0');
+                    dateValue = `${year}-${month}-${day}`;
+                }
+            }
+            document.getElementById('edit_timeline_date').value = dateValue;
             document.getElementById('edit_timeline_caption').value = caption || '';
             document.getElementById('editTimelineModal').style.display = 'block';
         }
+        
+        // Use event delegation for edit buttons to avoid quote escaping issues
+        document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.edit-timeline-btn')) {
+                    const btn = e.target.closest('.edit-timeline-btn');
+                    const id = btn.getAttribute('data-id');
+                    const title = btn.getAttribute('data-title') || '';
+                    const description = btn.getAttribute('data-description') || '';
+                    const date = btn.getAttribute('data-date') || '';
+                    const caption = btn.getAttribute('data-caption') || '';
+                    openEditTimelineEvent(id, title, description, date, caption);
+                }
+            });
+        });
         function closeTimelineModal() {
             const modal = document.getElementById('editTimelineModal');
             if (modal) modal.style.display = 'none';

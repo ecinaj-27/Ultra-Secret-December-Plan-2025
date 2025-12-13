@@ -239,3 +239,7 @@ if ($step === 'install' && file_exists($sql_file)) {
 </html>
 
 
+
+
+
+

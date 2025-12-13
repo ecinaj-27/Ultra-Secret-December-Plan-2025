@@ -48,8 +48,8 @@ body.passcode-body {
 
 /* ⚠️ IMPORTANT: Replace URL paths below with your actual image file names/paths */
 .image-1 { 
-    background-image: url('C:\xampp\htdocs\Secret\Ultra-Secret-December-Plan-2025\assets\slideshow-image\HOME.jpg');
-    opacity: 4; /* Show first image by default */
+    background-image: url('../slideshow-image/HOME.jpg');
+    opacity: 2; /* Show first image by default */
 }
 .image-2 { background-image: url('../slideshow-image/3cef6d1937a4be979b1de0cc21fc8645.jpg'); }
 .image-3 { background-image: url('../slideshow-image/7ef662f109068f53caedbee3d9fb9ab6.jpg'); }
@@ -61,7 +61,7 @@ body.passcode-body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.3); /* Changed to a semi-transparent black overlay for better contrast */
+    background: rgba(255, 255, 255, 0.184); /* Changed to a semi-transparent black overlay for better contrast */
     filter: blur(20px);
     z-index: -1;
 }

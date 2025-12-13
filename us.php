@@ -138,20 +138,38 @@ $locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
             <!-- Our Story content shown on Us page -->
             <section class="about-section active">
-                <div class="section-content">
+                <div class="section-content floating-elements-container">
+                    <!-- Floating Hearts and Tulips -->
+                    <div class="floating-heart" style="left: 10%; animation-delay: 0s;"></div>
+                    <div class="floating-heart" style="left: 20%; animation-delay: 1s;"></div>
+                    <div class="floating-heart" style="left: 30%; animation-delay: 2s;"></div>
+                    <div class="floating-heart" style="left: 70%; animation-delay: 0.5s;"></div>
+                    <div class="floating-heart" style="left: 80%; animation-delay: 1.5s;"></div>
+                    <div class="floating-heart" style="left: 90%; animation-delay: 2.5s;"></div>
+                    <div class="floating-tulip" style="left: 15%; animation-delay: 0.3s;"></div>
+                    <div class="floating-tulip" style="left: 25%; animation-delay: 1.3s;"></div>
+                    <div class="floating-tulip" style="left: 75%; animation-delay: 0.8s;"></div>
+                    <div class="floating-tulip" style="left: 85%; animation-delay: 1.8s;"></div>
+                    
                     <div class="section-header">
-                        <h2><i class="fas fa-book-heart"></i> Our Story</h2>
+                        <h2><i class="fas fa-book-heart"></i> <?php echo htmlspecialchars($content['our_story']['title'] ?? 'Our Story'); ?></h2>
                     </div>
                     <div class="story-content">
                         <?php if (!empty($content['our_story']['content'])): ?>
-                            <div class="story-text">
-                                <?php echo nl2br(htmlspecialchars($content['our_story']['content'])); ?>
-                            </div>
-                        <?php else: ?>
-                            <div class="story-text">
-                                <p>Our journey started on a beautiful day and keeps getting better.</p>
-                            </div>
+                        <div class="story-text">
+                            <p><?php echo nl2br(htmlspecialchars($content['our_story']['content'])); ?></p>
+                        </div>
                         <?php endif; ?>
+                        <div class="story-image-placeholder">
+                            <div class="story-image-container">
+                                <img id="our-story-image" src="" alt="Our Story" style="display: none; max-width: 100%; height: auto; border-radius: 10px;">
+                                <div class="story-image-placeholder-message" id="story-image-placeholder-message">
+                                    <i class="fas fa-image"></i>
+                                    <p>Your image will appear here</p>
+                                    <small>Upload your story image below</small>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>

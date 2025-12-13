@@ -156,11 +156,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
         
         .photo-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 4px;
             margin-top: 2rem;
-            max-width: 900px;
+            max-width: 1200px;
             margin-left: auto;
             margin-right: auto;
             background: white;
@@ -274,10 +273,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
         }
         
         /* Responsive Design */
+        @media (max-width: 1024px) {
+            .photo-grid {
+                grid-template-columns: repeat(3, 1fr);
+                max-width: 900px;
+            }
+        }
+        
         @media (max-width: 768px) {
             .photo-grid {
                 grid-template-columns: repeat(2, 1fr);
-                grid-template-rows: repeat(2, 1fr);
                 max-width: 600px;
                 gap: 3px;
                 padding: 3px;
@@ -287,7 +292,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
         @media (max-width: 480px) {
             .photo-grid {
                 grid-template-columns: 1fr;
-                grid-template-rows: repeat(3, 1fr);
                 max-width: 300px;
                 gap: 2px;
                 padding: 2px;
@@ -505,14 +509,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
                     </div>
                 <?php else: ?>
                     <?php 
-                    // Create a 3x3 grid (9 slots total)
-                    $grid_slots = 9;
-                    $photo_count = count($photos);
-                    
-                    // Fill the grid with photos and empty slots
-                    for ($i = 0; $i < $grid_slots; $i++): 
-                        if ($i < $photo_count): 
-                            $photo = $photos[$i];
+                    // Display all photos in a flexible grid (4 per row)
+                    foreach ($photos as $photo):
                     ?>
                         <div class="photo-item" data-photo-id="<?php echo $photo['id']; ?>">
                             <img src="<?php echo htmlspecialchars($photo['image_path']); ?>" 
@@ -532,14 +530,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_admin) {
                             </div>
                             <?php endif; ?>
                         </div>
-                    <?php else: ?>
-                        <div class="photo-item empty">
-                            <i class="fas fa-plus"></i>
-                        </div>
-                    <?php 
-                        endif;
-                    endfor; 
-                    ?>
+                    <?php endforeach; ?>
                 <?php endif; ?>
             </div>
         </div>

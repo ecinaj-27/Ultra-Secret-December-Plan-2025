@@ -103,26 +103,30 @@ foreach ($content_data as $content) {
                             <h3>Accessibility</h3>
                             <p>Designed to work seamlessly on all devices - from your phone during study breaks to your laptop for longer sessions. Always accessible, always there.</p>
                         </div>
-                        
-                        <div class="info-card">
-                            <i class="fas fa-graduation-cap"></i>
-                            <h3>Study Support</h3>
-                            <p>Includes specialized tools for medical studies - flashcards, study tracking, lab notebooks, and resource management to help you succeed academically.</p>
-                        </div>
                     </div>
                     
-                    <div class="features-list">
-                        <h3>Key Features</h3>
-                        <ul>
-                            <li><i class="fas fa-check"></i> Anniversary countdown and relationship timeline</li>
-                            <li><i class="fas fa-check"></i> Personal notes and love letters storage</li>
-                            <li><i class="fas fa-check"></i> Interactive map of places we've visited</li>
-                            <li><i class="fas fa-check"></i> Movies and music playlist management</li>
-                            <li><i class="fas fa-check"></i> Study tracker and medical resources</li>
-                            <li><i class="fas fa-check"></i> Art wall for creative expressions</li>
-                            <li><i class="fas fa-check"></i> Wish jar for future plans</li>
-                            <li><i class="fas fa-check"></i> Love letter scheduler</li>
-                        </ul>
+                    <!-- Resume/Info Placeholder Section -->
+                    <div class="resume-placeholder-section">
+                        <div class="resume-placeholder">
+                            <div class="resume-placeholder-header">
+                                <div class="resume-window-controls">
+                                    <span class="window-control red"></span>
+                                    <span class="window-control orange"></span>
+                                    <span class="window-control green"></span>
+                                </div>
+                                <h3 class="resume-placeholder-title">MY RESUME</h3>
+                            </div>
+                            <div class="resume-placeholder-content">
+                                <div class="resume-placeholder-message">
+                                    <i class="fas fa-file-alt"></i>
+                                    <p>Your resume/info will appear here</p>
+                                    <small>Upload your resume image or add your information below</small>
+                                </div>
+                                <div class="resume-content-area" id="resume-content-area">
+                                    <!-- Content will be added here -->
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>

@@ -39,6 +39,9 @@ $is_unlocked = $current_date >= $unlock_date;
 
             <div class="letter-container">
                 <?php if ($is_unlocked): ?>
+                    <!-- Floating Hearts and Flowers Container -->
+                    <div class="floating-hearts-container" id="floating-hearts-container"></div>
+                    
                     <div class="letter-content">
                         <div class="letter-date">March 20, 2025</div>
                         <div class="letter-text">
@@ -99,6 +102,57 @@ $is_unlocked = $current_date >= $unlock_date;
         }
         setInterval(updateCountdown, 60000);
         updateCountdown();
+
+        // Floating Hearts and Flowers Animation
+        <?php if ($is_unlocked): ?>
+        (function createFloatingElements() {
+            const container = document.getElementById('floating-hearts-container');
+            if (!container) return;
+
+            const hearts = ['❤️', '💕', '💖', '💗', '💓', '💝', '💘', '💞'];
+            const flowers = ['🌸', '🌺', '🌻', '🌷', '🌹', '🌼', '💐', '🌿'];
+
+            function createElement(type) {
+                const element = document.createElement('div');
+                element.className = type === 'heart' ? 'floating-heart' : 'floating-flower';
+                element.textContent = type === 'heart' 
+                    ? hearts[Math.floor(Math.random() * hearts.length)]
+                    : flowers[Math.floor(Math.random() * flowers.length)];
+                
+                // Random starting position
+                element.style.left = Math.random() * 100 + '%';
+                element.style.animationDelay = Math.random() * 5 + 's';
+                
+                // Random size variation
+                const size = 0.8 + Math.random() * 0.6;
+                element.style.fontSize = (size * 1.5) + 'rem';
+                
+                container.appendChild(element);
+
+                // Remove element after animation completes
+                setTimeout(() => {
+                    if (element.parentNode) {
+                        element.parentNode.removeChild(element);
+                    }
+                }, 15000);
+            }
+
+            // Create initial elements
+            for (let i = 0; i < 8; i++) {
+                setTimeout(() => createElement('heart'), i * 500);
+                setTimeout(() => createElement('flower'), i * 500 + 250);
+            }
+
+            // Continuously create new elements
+            setInterval(() => {
+                if (Math.random() > 0.5) {
+                    createElement('heart');
+                } else {
+                    createElement('flower');
+                }
+            }, 2000);
+        })();
+        <?php endif; ?>
     </script>
 </body>
 </html>
