@@ -360,18 +360,17 @@ A beautiful, comprehensive website built for couples to manage their relationshi
    - Ensure folder is named `Ultra-Secret-December-Plan-2025`
 
 3. **Database Setup**
-   - Open phpMyAdmin (http://localhost/phpmyadmin)
-   - Import the `database.sql` file to create the database and tables
-   - The database will be automatically created as `secret_plan_db`
-   - All tables, relationships, and sample data will be imported
+   - In InfinityFree vPanel, open **phpMyAdmin** for database `if0_42069228_Czarchive`
+   - Import `database.sql` (tables and sample data)
+   - On shared hosting the database already exists; do not run `CREATE DATABASE` manually
 
 4. **Configure Database Connection**
-   - Edit `config/database.php` if needed
-   - Default settings work with XAMPP:
-     - Host: `localhost`
-     - Database: `secret_plan_db`
-     - Username: `root`
-     - Password: `` (empty)
+   - Edit `config/database.php` and set `$sql_pass` to your vPanel password
+   - Defaults (all PHP files use these via `config/database.php`):
+     - Host: `sql209.infinityfree.com`
+     - Database: `if0_42069228_Czarchive`
+     - Username: `if0_42069228`
+     - Password: your vPanel password
 
 5. **Set Permissions**
    - Ensure the `uploads/` directory is writable (chmod 755 or 777)
@@ -387,7 +386,7 @@ A beautiful, comprehensive website built for couples to manage their relationshi
 6. **Access the Website**
    - Start Apache and MySQL in XAMPP
    - Open your browser
-   - Navigate to `http://localhost/Ultra-Secret-December-Plan-2025/`
+   - Navigate to your InfinityFree site URL (or local XAMPP path if testing locally)
    - Register a new account or create admin account manually
 
 ### Default Admin Account Setup

@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         // Check if database connection was successful
         if ($db === null) {
-            $error_message = 'Database connection failed. Please ensure MySQL is running and try again.';
+            $error_message = 'Database connection failed. Check config/database.php and that tables are imported.';
         } else {
             // Check if username already exists
             $query = "SELECT id FROM users WHERE username = :username";

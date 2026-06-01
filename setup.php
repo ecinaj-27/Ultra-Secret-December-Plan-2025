@@ -17,21 +17,8 @@ if (!file_exists($sql_file)) {
 
 if ($step === 'install' && file_exists($sql_file)) {
     try {
-        // Connect without database first
-        $temp_conn = new PDO(
-            "mysql:host=" . DB_HOST . ";charset=utf8mb4",
-            DB_USER,
-            DB_PASS
-        );
-        $temp_conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        
-        // Create database if it doesn't exist
-        $temp_conn->exec("CREATE DATABASE IF NOT EXISTS `" . DB_NAME . "` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-        $success[] = "Database '" . DB_NAME . "' created or already exists.";
-        
-        // Connect to the database
         $conn = new PDO(
-            "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4",
+            'mysql:host=' . DB_HOST . ';port=' . DB_PORT . ';dbname=' . DB_NAME . ';charset=utf8mb4',
             DB_USER,
             DB_PASS
         );
@@ -203,8 +190,9 @@ if ($step === 'install' && file_exists($sql_file)) {
             <div class="info-box">
                 <h3>Before you begin:</h3>
                 <ul>
-                    <li>Make sure MySQL/MariaDB is running in XAMPP</li>
-                    <li>Default settings use: <code>root</code> user with no password</li>
+                    <li>Confirm MySQL is available on InfinityFree and credentials in config/database.php are correct</li>
+                    <li>Uses InfinityFree: <code><?php echo htmlspecialchars($sql_host); ?></code> / <code><?php echo htmlspecialchars($sql_db); ?></code></li>
+                    <li>Set <code>$sql_pass</code> in <code>config/database.php</code> to your vPanel password</li>
                     <li>This script will create the database and all required tables</li>
                 </ul>
             </div>

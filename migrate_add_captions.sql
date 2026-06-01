@@ -1,7 +1,7 @@
 -- Migration script to add caption columns to timeline_events and locations tables
 -- Run this if you haven't updated your database with the new schema
 
-USE secret_plan_db;
+USE if0_42069228_Czarchive;
 
 -- Add caption column to timeline_events table if it doesn't exist
 ALTER TABLE timeline_events 

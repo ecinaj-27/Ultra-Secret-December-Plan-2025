@@ -1,8 +1,8 @@
 -- Ultra Secret December Plan 2025 Database
 -- Relationship Website Database Schema
 
-CREATE DATABASE IF NOT EXISTS secret_plan_db;
-USE secret_plan_db;
+-- InfinityFree: create DB in vPanel, then import (or select if0_42069228_Czarchive in phpMyAdmin)
+USE if0_42069228_Czarchive;
 
 -- Roles table
 CREATE TABLE roles (
