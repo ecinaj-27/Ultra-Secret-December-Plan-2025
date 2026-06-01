@@ -1,3 +1,4 @@
+cat > Dockerfile << 'EOF'
 FROM dunglas/frankenphp:latest
 
 # Install MySQL PDO extension
@@ -10,3 +11,4 @@ EXPOSE 80
 
 ENTRYPOINT ["frankenphp"]
 CMD ["run", "--config", "/etc/caddy/Caddyfile"]
+EOF
