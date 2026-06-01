@@ -1,9 +1,11 @@
 <?php
 // Database configuration
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'secret_plan_db');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+// Database configuration - use Railway MySQL service variables
+define('DB_HOST', getenv('MYSQLHOST') ?: 'localhost');
+define('DB_NAME', getenv('MYSQLDATABASE') ?: 'secret_plan_db');
+define('DB_USER', getenv('MYSQLUSER') ?: 'root');
+define('DB_PASS', getenv('MYSQLPASSWORD') ?: '');
+define('DB_PORT', getenv('MYSQLPORT') ?: '3306');
 
 class Database {
     private $host = DB_HOST;
@@ -23,7 +25,7 @@ class Database {
             
             // First, try to connect without database to check if server is available
             $temp_conn = new PDO(
-                "mysql:host=" . $this->host . ";charset=utf8mb4",
+                "mysql:host=" . $this->host . ";port=" . DB_PORT . ";charset=utf8mb4",
                 $this->username,
                 $this->password
             );
@@ -41,10 +43,11 @@ class Database {
             
             // Now connect to the actual database
             $this->conn = new PDO(
-                "mysql:host=" . $this->host . ";dbname=" . $this->db_name . ";charset=utf8mb4",
+                "mysql:host=" . $this->host . ";port=" . DB_PORT . ";dbname=" . $this->db_name . ";charset=utf8mb4",
                 $this->username,
                 $this->password
             );
+            
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->conn->exec("set names utf8mb4");
         } catch(PDOException $exception) {
