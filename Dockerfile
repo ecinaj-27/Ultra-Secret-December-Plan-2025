@@ -1,0 +1,14 @@
+cat > Dockerfile << 'EOF'
+FROM dunglas/frankenphp:latest
+
+# Install MySQL PDO extension
+RUN install-php-extensions pdo_mysql
+
+# Copy app files
+COPY . /app
+
+EXPOSE 80
+
+ENTRYPOINT ["frankenphp"]
+CMD ["run", "--config", "/etc/caddy/Caddyfile"]
+EOF
