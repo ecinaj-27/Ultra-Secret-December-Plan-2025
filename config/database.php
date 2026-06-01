@@ -2,7 +2,7 @@
 // Database connection — InfinityFree (single source of truth for the whole project)
 $sql_host = getenv('DB_HOST') ?: 'sql209.infinityfree.com';
 $sql_user = getenv('DB_USER') ?: 'if0_42069228';
-$sql_pass = getenv('DB_PASS') ?: 'GmAiL_007JniCEjNeFuNGO?!'; // vPanel login password
+$sql_pass = getenv('DB_PASS') ?: 'fungojanice07'; // vPanel login password
 $sql_db   = getenv('DB_NAME') ?: 'if0_42069228_Czarchive';
 
 define('DB_HOST', $sql_host);
